@@ -1,12 +1,11 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, unused_field, use_build_context_synchronously, avoid_print, prefer_interpolation_to_compose_strings, unnecessary_string_interpolations, deprecated_member_use
 
-import 'package:costly/auth/main_page.dart';
+import 'package:costlynew/auth/mainpage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'home.dart';
+import 'homepage.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
@@ -30,6 +29,67 @@ class _AccountPageState extends State<AccountPage> {
 
   Future changeProfilePic(String url) async {
     await db.collection('userData').doc(userID).update({'profilePicture': url});
+  }
+
+  Future forgotPassword() async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: user.email!,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Password reset email sent! Don\'t forget to check the spam folder!'),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      print('Failed with error code: ${e.code}');
+      print(e.message);
+
+      if (e.code == 'wrong-password') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Wrong password entered.'),
+          ),
+        );
+      }
+      if (e.code == 'too-many-requests') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('You have tried too often, try again later.'),
+          ),
+        );
+      }
+      if (e.code == 'missing-email') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No Email Address entered'),
+          ),
+        );
+      }
+      if (e.code == 'unknown') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Wrong email or password entered, please try again.'),
+          ),
+        );
+      }
+      if (e.code == 'invalid-email') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('The email you entered is not valid.'),
+          ),
+        );
+      }
+
+      if (e.code == 'user-not-found') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('This user does not exist.'),
+          ),
+        );
+      }
+    }
   }
 
   Future<String> getProfilePicUrl() async {
@@ -81,9 +141,7 @@ class _AccountPageState extends State<AccountPage> {
               decoration: InputDecoration(hintText: "Insert image or gif URL"),
             ),
             actions: <Widget>[
-              FlatButton(
-                color: Colors.orange,
-                textColor: Colors.white,
+              ElevatedButton(
                 child: Text('OK'),
                 onPressed: () {
                   setState(() {
@@ -219,15 +277,29 @@ class _AccountPageState extends State<AccountPage> {
                   Padding(
                     padding: const EdgeInsets.all(15.0),
                     child: Text(
-                      'Signed in as: ${user.email!}',
+                      '${user.email!}',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 25,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
 
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.orange[800],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ) // Background color
+                          ),
+                      onPressed: (() {
+                        forgotPassword();
+                      }),
+                      child: Text('Change Password')),
+                  SizedBox(
+                    height: 10,
+                  ),
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           primary: Colors.orange[800],

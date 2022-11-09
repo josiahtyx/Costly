@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "costlyfinance",
+    "site":"costlyfinance",
     "public": "build/web",
     "ignore": [
       "firebase.json",

@@ -1,12 +1,9 @@
-// ignore_for_file: prefer_const_constructors, avoid_print
-// ignore_for_file: curly_braces_in_flow_control_structures
-import 'package:cloud_firestore/cloud_firestore.dart';
+// ignore_for_file: prefer_const_constructors, unused_field, use_build_context_synchronously, avoid_print, prefer_interpolation_to_compose_strings, unnecessary_string_interpolations, deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:costly/data/passerFunctions.dart';
-
-var newField = new AddMonthField();
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPage extends StatefulWidget {
   final VoidCallback showLoginPage;
@@ -20,23 +17,31 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final db = FirebaseFirestore.instance;
+  final piggybank = Image(image: AssetImage('assets/images/piggybank.png'));
+  final costlyLogo = Image(
+    image: AssetImage('assets/icons/costlylogo.png'),
+    width: 250,
+  );
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final bool _value = false;
+  final db = FirebaseFirestore.instance;
+
   final _confirmPasswordController = TextEditingController();
-  final _usernameController = TextEditingController();
+  //final _usernameController = TextEditingController();
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _usernameController.dispose();
+    // _usernameController.dispose();
     super.dispose();
   }
 
   bool _isObscure = true;
   Future signUp() async {
-    if (passwordConfirmed())
+    if (passwordConfirmed()) {
       try {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
@@ -45,7 +50,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
         //add user details
         addUserDetails(
-          _usernameController.text.trim(),
+          //      _usernameController.text.trim(),
           _emailController.text.trim(),
         );
 
@@ -107,14 +112,15 @@ class _RegisterPageState extends State<RegisterPage> {
           );
         }
       }
+    }
   }
 
-  Future addUserDetails(String username, String email) async {
+  Future addUserDetails(String email) async {
     await db
         .collection('userData')
         .doc(FirebaseAuth.instance.currentUser?.uid)
         .set({
-      'username': username,
+      // 'username': username,
       'email': email,
     });
   }
@@ -133,8 +139,7 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget mobileRegister(BuildContext context) {
     return Scaffold(
         // appBar: AppBar(
         //   title: Text('Register'),
@@ -166,26 +171,26 @@ class _RegisterPageState extends State<RegisterPage> {
                       height: 30,
                     ),
                     //username
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          border: Border.all(color: Colors.white),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 20.0),
-                          child: TextField(
-                            controller: _usernameController,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Username',
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                    //   child: Container(
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.grey[200],
+                    //       border: Border.all(color: Colors.white),
+                    //       borderRadius: BorderRadius.circular(12),
+                    //     ),
+                    //     child: Padding(
+                    //       padding: const EdgeInsets.only(left: 20.0),
+                    //       child: TextField(
+                    //         controller: _usernameController,
+                    //         decoration: InputDecoration(
+                    //           border: InputBorder.none,
+                    //           hintText: 'Username',
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     SizedBox(
                       height: 5,
                     ),
@@ -342,5 +347,220 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     ));
+  }
+
+  Widget desktopRegister(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(100, 50, 100, 50),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              child: piggybank,
+            ),
+            SizedBox(
+              width: 150,
+            ),
+            Container(
+              width: 620,
+              height: 872,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.4),
+                    spreadRadius: 10,
+                    blurRadius: 30,
+                    offset: Offset(0, 0), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(75, 75, 75, 75),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      costlyLogo,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 40.0),
+                        child: Text(
+                          'Register',
+                          style: GoogleFonts.montserrat(
+                              fontWeight: FontWeight.w800, fontSize: 36),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'Already have an account?  ',
+                            style: GoogleFonts.montserrat(
+                                fontWeight: FontWeight.w600, fontSize: 24),
+                          ),
+                          MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: widget.showLoginPage,
+                              child: Text(
+                                'Log In',
+                                style: GoogleFonts.montserrat(
+                                    decoration: TextDecoration.underline,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 24,
+                                    color: Colors.orange[800]),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15.0),
+                        child: Text(
+                          'Email Address',
+                          style: GoogleFonts.montserrat(
+                              fontWeight: FontWeight.w600, fontSize: 24),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: TextField(
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Email',
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Password',
+                              style: GoogleFonts.montserrat(
+                                  fontWeight: FontWeight.w600, fontSize: 24),
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                '   Please ensure that password has more than 6 letters',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: TextField(
+                            controller: _passwordController,
+                            obscureText: _isObscure,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Password',
+                              suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _isObscure
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isObscure = !_isObscure;
+                                    });
+                                  }),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: TextField(
+                            controller: _confirmPasswordController,
+                            obscureText: _isObscure,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Confirm Password',
+                              suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _isObscure
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isObscure = !_isObscure;
+                                    });
+                                  }),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: signUp,
+                          child: Container(
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                  color: Colors.orange[800],
+                                  borderRadius: BorderRadius.circular(12)),
+                              child: Center(
+                                  child: Text('Register',
+                                      style: GoogleFonts.montserrat(
+                                          color: Colors.white,
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w600)))),
+                        ),
+                      ),
+                    ]),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth > 1480) {
+          return desktopRegister(context);
+        } else {
+          return mobileRegister(context);
+        }
+      },
+    );
   }
 }

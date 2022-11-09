@@ -1,14 +1,5 @@
 {
   "projects": {
     "default": "costly-c6d95"
-  },
-  "targets": {
-    "costly-c6d95": {
-      "hosting": {
-        "myapp": [
-          "finance-costly"
-        ]
-      }
-    }
   }
 }

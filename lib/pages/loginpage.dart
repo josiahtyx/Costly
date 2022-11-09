@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, unused_field, use_build_context_synchronously, avoid_print, prefer_interpolation_to_compose_strings, unnecessary_string_interpolations, deprecated_member_use, avoid_unnecessary_containers, sort_child_properties_last
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,8 +14,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final piggybank = Image(image: AssetImage('assets/images/piggybank.png'));
+  final costlyLogo = Image(
+    image: AssetImage('assets/icons/costlylogo.png'),
+    width: 250,
+  );
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _value = false;
+  bool _isObscure = true;
 
   Future signIn() async {
     try {
@@ -71,16 +79,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  bool _isObscure = true;
-  @override
-  Widget build(BuildContext context) {
+  Widget mobileLogin(BuildContext context) {
     return Scaffold(
         // appBar: AppBar(
         //   title: Text('Login Page'),
@@ -92,10 +91,10 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
+              padding: const EdgeInsets.fromLTRB(10, 5, 10, 30),
               child: SizedBox(
-                height: 150,
-                child: Image(image: AssetImage('assets/logo1.png')),
+                height: 70,
+                child: Image(image: AssetImage('assets/icons/costlylogo.png')),
               ),
             ),
             //Login Module
@@ -110,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 30,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   SizedBox(
@@ -212,8 +211,8 @@ class _LoginPageState extends State<LoginPage> {
                         child: Text(
                           'Forgot Password?',
                           style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.normal,
+                            color: Colors.grey,
+                            fontStyle: FontStyle.italic,
                           ),
                         ),
                       ),
@@ -222,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 20,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                           )),
                       GestureDetector(
                         onTap: widget.showRegisterPage,
@@ -231,7 +230,7 @@ class _LoginPageState extends State<LoginPage> {
                           style: TextStyle(
                             color: Colors.blue,
                             fontSize: 15,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       )
@@ -244,5 +243,214 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     ));
+  }
+
+  Widget desktopLogin(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(100, 50, 100, 50),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              child: piggybank,
+            ),
+            SizedBox(
+              width: 150,
+            ),
+            Container(
+              width: 620,
+              height: 872,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(75, 75, 75, 75),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      costlyLogo,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 40.0),
+                        child: Text(
+                          "Login",
+                          style: GoogleFonts.montserrat(
+                              fontWeight: FontWeight.w800, fontSize: 36),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "Don't have an account yet?  ",
+                            style: GoogleFonts.montserrat(
+                                fontWeight: FontWeight.w600, fontSize: 24),
+                          ),
+                          MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: widget.showRegisterPage,
+                              child: Text(
+                                "Sign Up",
+                                style: GoogleFonts.montserrat(
+                                    decoration: TextDecoration.underline,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 24,
+                                    color: Colors.orange[800]),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15.0),
+                        child: Text(
+                          'Email Address',
+                          style: GoogleFonts.montserrat(
+                              fontWeight: FontWeight.w600, fontSize: 24),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: TextField(
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Email',
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15.0),
+                        child: Text(
+                          'Password',
+                          style: GoogleFonts.montserrat(
+                              fontWeight: FontWeight.w600, fontSize: 24),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: TextField(
+                            controller: _passwordController,
+                            obscureText: _isObscure,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Password',
+                              suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _isObscure
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isObscure = !_isObscure;
+                                    });
+                                  }),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                    child: Checkbox(
+                                  value: _value,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _value = value!;
+                                    });
+                                  },
+                                  activeColor: Colors.orange[800],
+                                )),
+                                Text('Remember Me')
+                              ],
+                            ),
+                            MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ResetPassword()),
+                                    );
+                                  },
+                                  child: Text(
+                                    "Forgot Password?",
+                                    style: GoogleFonts.montserrat(
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ))
+                          ],
+                        ),
+                      ),
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: signIn,
+                          child: Container(
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                  color: Colors.orange[800],
+                                  borderRadius: BorderRadius.circular(12)),
+                              child: Center(
+                                  child: Text('Login',
+                                      style: GoogleFonts.montserrat(
+                                          color: Colors.white,
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w600)))),
+                        ),
+                      ),
+                    ]),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.4),
+                    spreadRadius: 10,
+                    blurRadius: 30,
+                    offset: Offset(0, 0), // changes position of shadow
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth > 1480) {
+          return desktopLogin(context);
+        } else {
+          return mobileLogin(context);
+        }
+      },
+    );
   }
 }
