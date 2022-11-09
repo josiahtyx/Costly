@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 # costlynew
+=======
+#Costly
+A finance management web application that allows you to easily track the cost of your purchases.
+>>>>>>> parent of d396f85 (Update README.md)
 
 A new Flutter project.
 
