@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, unused_field, use_build_context_synchronously, avoid_print, prefer_interpolation_to_compose_strings, unnecessary_string_interpolations, deprecated_member_use
 
 import 'package:costlynew/auth/mainpage.dart';
+import 'package:costlynew/data/passerFunctions.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -123,6 +124,46 @@ class _AccountPageState extends State<AccountPage> {
     await db.collection('userData').doc(userID).update(
       {'username': newUserName},
     );
+  }
+
+  Future<void> confirmDeleteTransactions(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(
+                style: TextStyle(fontWeight: FontWeight.w800),
+                'DELETE ALL DATA'),
+            content: Text(
+                "Are you sure you want to delete all your account data and transactions? This action is irreversible"),
+            actions: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red, // background
+                  onPrimary: Colors.white, // foreground
+                ),
+                child: Text('OK'),
+                onPressed: () {
+                  setState(() {
+                    delAllData(userID.toString());
+                    FirebaseAuth.instance.signOut();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MainPage()),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('All your data has been deleted.'),
+                      ),
+                    );
+
+                    // changeProfilePic(url);
+                  });
+                },
+              ),
+            ],
+          );
+        });
   }
 
   Future<void> _displayTextInputDialog(BuildContext context) async {
@@ -285,7 +326,20 @@ class _AccountPageState extends State<AccountPage> {
                       ),
                     ),
                   ),
-
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.orange[800],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ) // Background color
+                          ),
+                      onPressed: (() {
+                        confirmDeleteTransactions(context);
+                      }),
+                      child: Text('Delete All Data')),
+                  SizedBox(
+                    height: 10,
+                  ),
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           primary: Colors.orange[800],
@@ -316,7 +370,7 @@ class _AccountPageState extends State<AccountPage> {
                               builder: (context) => const MainPage()),
                         );
                       }),
-                      child: Text('Sign Out')),
+                      child: Text('Log Out')),
 
                   //delete account
                   // Padding(

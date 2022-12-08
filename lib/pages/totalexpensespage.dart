@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:costlynew/widgets/totalexpenses.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:costlynew/pages/newExpensesAllTime.dart';
+import 'package:costlynew/pages/newExpenses.dart';
 
 class TotalExpensesPage extends StatefulWidget {
   const TotalExpensesPage({Key? key}) : super(key: key);
@@ -62,10 +62,7 @@ class _TotalExpensesPageState extends State<TotalExpensesPage> {
             SizedBox(
               height: 10,
             ),
-            MediaQuery.removePadding(
-                context: context,
-                removeTop: true,
-                child: TransactionsAreaYearly())
+            TransactionsAreaYearly()
           ]),
         ));
   }

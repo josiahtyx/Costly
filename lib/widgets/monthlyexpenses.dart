@@ -9,7 +9,6 @@ import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'package:costlynew/data/passerFunctions.dart';
-import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 var funcGet = new GetTransactions();
 var funcGetYear = new GetTransactionsYearly();
@@ -239,16 +238,21 @@ class _TransactionsAreaState extends State<TransactionsArea> {
                             // what to do after an item has been swiped away.
                             onDismissed: (direction) async {
                               delTransaction(
-                                  (userTransactions[index]['itemName'])
-                                      .toString(),
-                                  (userTransactions[index]['itemPrice'])
-                                      .toString(),
-                                  (userTransactions[index]['itemDate'])
-                                      .toString(),
-                                  (userTransactions[index]['daysBetween'])
-                                      .toString(),
-                                  (userTransactions[index]['costPerDay'])
-                                      .toString());
+                                (userTransactionsYearly[index]['category'])
+                                    .toString(),
+                                (userTransactionsYearly[index]['costPerDay'])
+                                    .toString(),
+                                (userTransactionsYearly[index]['duration'])
+                                    .toString(),
+                                (userTransactionsYearly[index]['endDate'])
+                                    .toString(),
+                                (userTransactionsYearly[index]['itemDate'])
+                                    .toString(),
+                                (userTransactionsYearly[index]['itemName'])
+                                    .toString(),
+                                (userTransactionsYearly[index]['itemPrice'])
+                                    .toString(),
+                              );
                               // Remove the item from the data source.
                               setState(() {
                                 userTransactions.removeAt(index);

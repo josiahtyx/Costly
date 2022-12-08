@@ -81,8 +81,7 @@ class _MobilePageState extends State<MobilePage> {
             SizedBox(
               height: 10,
             ),
-            MediaQuery.removePadding(
-                context: context, removeTop: true, child: TransactionsArea())
+            TransactionsArea()
           ]),
         ));
   }

@@ -29,59 +29,18 @@ class _TransactionsAreaYearlyState extends State<TransactionsAreaYearly> {
   int listLength = 1;
   late int daysBetween;
 
-  Widget subtitleText(index) {
-    if (index['duration'] != "0") {
-      return Text(('Item Price: ' +
-              index['itemPrice'] +
-              '€' +
-              '\nPurchase Date: ' +
-              index['itemDate'] +
-              '   ' +
-              'End Date: ' +
-              index['endDate'])
-          .toString());
-    } else {
-      return Text(('Item Price: ' +
-              index['itemPrice'] +
-              '€' +
-              '\nPurchase Date: ' +
-              index['itemDate'] +
-              '')
-          .toString());
-    }
-  }
+  double calculateCPD(date, price) {
+    DateTime receivedDate = DateTime.parse(date);
+    int dateDifference = ((DateTime.now().difference(receivedDate).inDays) + 1);
+    // print(dateDifference);
+    daysBetween =
+        dateDifference; //so first we get the difference from the transaction date and today.
 
-//(index['costPerDay'] + "€" + "/" + index['duration'] + "d")
-
-  Widget calculateCPD(index) {
-    if (index['duration'] != "0") {
-      return Text(
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
-          " " + index['costPerDay'] + "€" + "/" + index['duration'] + "d");
-    } else {
-      DateTime receivedDate = DateTime.parse(index['itemDate']);
-      int dateDifference =
-          ((DateTime.now().difference(receivedDate).inDays) + 1);
-      // print(dateDifference);
-      daysBetween =
-          dateDifference; //so first we get the difference from the transaction date and today.
-
-      double receivedPrice = double.parse(index[
-          'itemPrice']); //then we take the price and turn it into a double
-      String cpdAmount = (receivedPrice / daysBetween).toStringAsFixed(2);
-      double newcpdAmount = double.parse(cpdAmount);
-      return Text(
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
-          newcpdAmount.toString() + "€" + "/" + daysBetween.toString() + "d");
-    }
+    double receivedPrice =
+        double.parse(price); //then we take the price and turn it into a double
+    String cpdAmount = (receivedPrice / daysBetween).toStringAsFixed(2);
+    double newcpdAmount = double.parse(cpdAmount);
+    return newcpdAmount;
   }
 
   late Future<List<dynamic>> transactionsDataMonth;
@@ -294,13 +253,35 @@ class _TransactionsAreaYearlyState extends State<TransactionsAreaYearly> {
                                     ),
                                     (userTransactionsYearly[index]['itemName'])
                                         .toString()),
-                                subtitle:
-                                    subtitleText(userTransactionsYearly[index]),
+                                subtitle: Text(('Item Price: ' +
+                                        userTransactionsYearly[index]
+                                            ['itemPrice'] +
+                                        '€' +
+                                        '\nPurchase Date: ' +
+                                        userTransactionsYearly[index]
+                                            ['itemDate'] +
+                                        '')
+                                    .toString()),
                                 trailing: Wrap(
                                   spacing: 12, // space between two icons
                                   children: <Widget>[
-                                    calculateCPD(
-                                      (userTransactionsYearly[index]),
+                                    Text(
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      ((calculateCPD(
+                                                  (userTransactionsYearly[index]
+                                                      ['itemDate']),
+                                                  (userTransactionsYearly[index]
+                                                      ['itemPrice'])))
+                                              .toString() +
+                                          "€" +
+                                          "/" +
+                                          daysBetween.toString() +
+                                          "d"), // icon-1
+                                      // Icon(Icons.delete), // icon-2
                                     )
                                   ],
                                 ),

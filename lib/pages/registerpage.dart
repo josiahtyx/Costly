@@ -370,7 +370,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 borderRadius: BorderRadius.all(Radius.circular(20)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.4),
+                    color: Colors.grey.withOpacity(0.1),
                     spreadRadius: 10,
                     blurRadius: 30,
                     offset: Offset(0, 0), // changes position of shadow
@@ -492,6 +492,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                         ),
                       ),
+                      SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.grey[200],

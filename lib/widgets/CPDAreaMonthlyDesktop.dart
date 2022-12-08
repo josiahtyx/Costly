@@ -20,6 +20,13 @@ class _CPDAreaState extends State<CPDArea> {
   DateTime firstDay = DateTime(DateTime.now().year, DateTime.now().month, 1);
   late int daysBetween;
 
+  int daysInMonth() {
+    DateTime now = new DateTime.now();
+    DateTime lastDayOfMonth = new DateTime(now.year, now.month + 1, 0);
+    print("N days: ${lastDayOfMonth.day}");
+    return lastDayOfMonth.day;
+  }
+
   int GetDaysDifference() {
     int dateDifference = ((DateTime.now().difference(firstDay).inDays) + 1);
     // print(dateDifference);
@@ -29,7 +36,9 @@ class _CPDAreaState extends State<CPDArea> {
 
   String calculateCPD(data) {
     double receivedData = data;
-    String cpdAmount = (receivedData / daysBetween).toStringAsFixed(2);
+    //CPD (amount/days in the month)
+    int days = daysInMonth();
+    String cpdAmount = (receivedData / days).toStringAsFixed(2);
     return cpdAmount;
   }
 
@@ -50,6 +59,7 @@ class _CPDAreaState extends State<CPDArea> {
     setState(() {});
     // getCPDtotal();
     // totalCPD = getCPDtotal();
+    daysInMonth();
   }
 
   @override

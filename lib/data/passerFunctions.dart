@@ -83,7 +83,8 @@ class GetTransactions {
     List transactionList = (data['transactions']);
     listLength = transactionList.length;
     userTransactions = transactionList;
-    return transactionList;
+    userTransactions..sort((a, b) => a['itemDate'].compareTo(b['itemDate']));
+    return userTransactions;
     // callBack(listLength);
     // print(listLength);
   }
@@ -96,7 +97,7 @@ class GetTransactionsYearly {
         .doc(userID)
         .collection('transactions')
         .doc(
-            year); //Change here between 'All' and (year) for present year. // TODO: Add year picker
+            'All'); //Change here between 'All' and (year) for present year. // TODO: Add year picker
 
     DocumentSnapshot snapshot = await transactionsRef.get();
     final data = snapshot.data() as Map<String, dynamic>;
@@ -104,14 +105,22 @@ class GetTransactionsYearly {
     List transactionList = (data['transactions']);
     listLength = transactionList.length;
     userTransactions = transactionList;
-    return transactionList;
+    userTransactions..sort((a, b) => a['itemDate'].compareTo(b['itemDate']));
+    return userTransactions;
     // callBack(listLength);
-    // print(listLength);
   }
 }
 
-Future delTransaction(String itemName, String price, String purchaseDate,
-    String daysBetween, String costPerDay) async {
+Future delTransaction(
+  String category,
+  String costPerDay,
+  String duration,
+  String endDate,
+  String purchaseDate,
+  String itemName,
+  String price,
+  //String daysBetween,
+) async {
   await db
       .collection('userData')
       .doc(userID)
@@ -121,11 +130,14 @@ Future delTransaction(String itemName, String price, String purchaseDate,
     'transactions': FieldValue.arrayRemove(
       [
         {
+          'category': category,
+          'costPerDay': costPerDay,
+          'duration': duration,
+          'endDate': endDate,
+          'itemDate': purchaseDate,
           'itemName': itemName,
           'itemPrice': price,
-          'itemDate': purchaseDate,
-          'daysBetween': daysBetween,
-          'costPerDay': costPerDay,
+          //'daysBetween': daysBetween,
         },
       ],
     ),
@@ -139,11 +151,14 @@ Future delTransaction(String itemName, String price, String purchaseDate,
     'transactions': FieldValue.arrayRemove(
       [
         {
+          'category': category,
+          'costPerDay': costPerDay,
+          'duration': duration,
+          'endDate': endDate,
+          'itemDate': purchaseDate,
           'itemName': itemName,
           'itemPrice': price,
-          'itemDate': purchaseDate,
-          'daysBetween': daysBetween,
-          'costPerDay': costPerDay,
+          //'daysBetween': daysBetween,
         },
       ],
     ),
@@ -157,11 +172,14 @@ Future delTransaction(String itemName, String price, String purchaseDate,
     'transactions': FieldValue.arrayRemove(
       [
         {
+          'category': category,
+          'costPerDay': costPerDay,
+          'duration': duration,
+          'endDate': endDate,
+          'itemDate': purchaseDate,
           'itemName': itemName,
           'itemPrice': price,
-          'itemDate': purchaseDate,
-          'daysBetween': daysBetween,
-          'costPerDay': costPerDay,
+          //'daysBetween': daysBetween,
         },
       ],
     ),
@@ -275,3 +293,7 @@ class GetTotalSpentYearly {
 // void printList() {
 //   print(userTransactions[0]);
 // }
+Future delAllData(String userID) async {
+  await db.collection('userData').doc(userID).delete();
+  user.delete();
+}

@@ -20,11 +20,29 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
   FocusNode myFocusNode = new FocusNode();
   final db = FirebaseFirestore.instance;
   TextEditingController dateinput = TextEditingController();
+  DateTime? pickedStartDate;
+  DateTime? pickedEndDate;
+  TextEditingController endDateInput = TextEditingController();
   final _itemNameController = TextEditingController();
+  final _itemCategoryController = TextEditingController();
   final _priceController = TextEditingController();
   final monthYear = DateFormat('MMMM y').format(DateTime.now());
   final year = DateFormat('y').format(DateTime.now());
   final userID = FirebaseAuth.instance.currentUser?.uid;
+  String dropdownCategory = "Food";
+
+  var categories = [
+    'Food',
+    'Subscriptions',
+    'Travel',
+    'Tech',
+    'Utilities',
+  ];
+
+  String duration = "0";
+  durationDays(String duration) {
+    this.duration = duration;
+  }
 
   late String daysBetween;
   callBackDaysBetween(String daysBetween) {
@@ -38,16 +56,22 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
 
   String CPDCalculator() {
     double price = double.parse(_priceController.text.replaceAll(',', '.'));
-    int theNumberofDaysBetween = int.parse(daysBetween);
-    String tempCPD = (price / (theNumberofDaysBetween + 1)).toStringAsFixed(2);
+    int days = int.parse(duration.toString());
+    String tempCPD = (price / days).toStringAsFixed(2);
     double totalCPD = double.parse(tempCPD);
     String totalCPDstring = totalCPD.toString();
     // double finalCPD = double.parse(totalCPDstring.replaceAll('.', ','));
     return totalCPDstring;
   }
 
-  Future addTransaction(String itemName, String price, String purchaseDate,
-      String daysBetween, String costPerDay) async {
+  Future addTransaction(
+      String itemName,
+      String price,
+      String purchaseDate,
+      String endDate,
+      String duration,
+      String costPerDay,
+      String itemCategory) async {
     await db
         .collection('userData')
         .doc(userID)
@@ -60,30 +84,35 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
             'itemName': itemName,
             'itemPrice': price,
             'itemDate': purchaseDate,
-            'daysBetween': daysBetween,
+            //'daysBetween': daysBetween, //this is kinda useless since calculation is done later
+            'endDate': endDate,
+            'duration': duration,
             'costPerDay': costPerDay,
+            'category': itemCategory,
           },
         ],
       ),
     }, SetOptions(merge: true));
-    db
-        .collection('userData')
-        .doc(userID)
-        .collection('transactions')
-        .doc(year)
-        .set({
-      'transactions': FieldValue.arrayUnion(
-        [
-          {
-            'itemName': itemName,
-            'itemPrice': price,
-            'itemDate': purchaseDate,
-            'daysBetween': daysBetween,
-            'costPerDay': costPerDay,
-          },
-        ],
-      ),
-    }, SetOptions(merge: true));
+    // Make a new IF YEAR = year.now then add to year collection
+    // db
+    //     .collection('userData')
+    //     .doc(userID)
+    //     .collection('transactions')
+    //     .doc(year)
+    //     .set({
+    //   'transactions': FieldValue.arrayUnion(
+    //     [
+    //       {
+    //         'itemName': itemName,
+    //         'itemPrice': price,
+    //         'itemDate': purchaseDate,
+    //         'daysBetween': daysBetween,
+    //         'costPerDay': costPerDay,
+    //       },
+    //     ],
+    //   ),
+    // }, SetOptions(merge: true));
+    //
     db
         .collection('userData')
         .doc(userID)
@@ -96,8 +125,11 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
             'itemName': itemName,
             'itemPrice': price,
             'itemDate': purchaseDate,
-            'daysBetween': daysBetween,
+            //'daysBetween': daysBetween, //this is kinda useless since calculation is done later
+            'endDate': endDate,
+            'duration': duration,
             'costPerDay': costPerDay,
+            'category': itemCategory,
           },
         ],
       ),
@@ -201,7 +233,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'What did you buy?',
+                          'What was your purchase?',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 20,
@@ -247,7 +279,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'How much did you spend?',
+                          'Amount of purchase',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 20,
@@ -298,7 +330,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'When did you buy it?',
+                          'Purchase Date',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 20,
@@ -381,7 +413,10 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                                 //you can implement different kind of Date Format here according to your requirement
 
                                 setState(() {
+                                  pickedStartDate = pickedDate;
+                                  //print(pickedStartDate);
                                   dateinput.text = formattedDate;
+
                                   callBackDaysBetween(difference);
                                   callBackMY(
                                       transactionMY); //set output date to TextField value.
@@ -397,10 +432,178 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                   ]),
                 ),
               ),
-              SizedBox(
-                height: 20,
-              ),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Container(
+                  child: Column(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'End Date (Optional)',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: TextField(
+                            controller: endDateInput,
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                icon: Icon(Icons.calendar_today,
+                                    color: myFocusNode.hasFocus
+                                        ? Colors.orange
+                                        : Colors.black), //icon of text field
+                                labelText: "Enter Date",
+                                labelStyle: TextStyle(
+                                    color: myFocusNode.hasFocus
+                                        ? Colors.orange
+                                        : Colors.black) //label text of field
+                                ),
+                            readOnly:
+                                true, //set it true, so that user will not able to edit text
+                            onTap: () async {
+                              DateTime? pickedEndDate = await showDatePicker(
+                                  builder: (context, child) {
+                                    return Theme(
+                                      data: Theme.of(context).copyWith(
+                                        colorScheme: ColorScheme.light(
+                                          primary: Colors
+                                              .orange, // header background color
+                                          onPrimary:
+                                              Colors.white, // header text color
+                                          onSurface:
+                                              Colors.black, // body text color
+                                        ),
+                                        textButtonTheme: TextButtonThemeData(
+                                          style: TextButton.styleFrom(
+                                            primary: Colors
+                                                .black, // button text color
+                                          ),
+                                        ),
+                                      ),
+                                      child: child!,
+                                    );
+                                  },
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(
+                                      2000), //DateTime.now() - not to allow to choose before today.
+                                  lastDate: DateTime(2200));
 
+                              if (pickedEndDate != null) {
+                                // print(pickedDate);
+
+                                final difference = (pickedEndDate
+                                        .difference(pickedStartDate!)
+                                        .inDays)
+                                    .toString();
+
+                                // print(transactionMY);
+                                String formattedDate = DateFormat('yyyy-MM-dd')
+                                    .format(pickedEndDate);
+                                int duration = int.parse(difference) + 1;
+                                print(duration);
+                                // print(
+                                //     formattedDate); //formatted date output using intl package =>  2021-03-16
+                                //you can implement different kind of Date Format here according to your requirement
+
+                                setState(() {
+                                  endDateInput.text =
+                                      formattedDate; //to change textfield section
+                                  durationDays(duration.toString());
+                                });
+                              } else {
+                                print("Date is not selected");
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ]),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Container(
+                  child: Column(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Category',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: DropdownButton(
+                              // Initial Value
+                              value: dropdownCategory,
+
+                              // Down Arrow Icon
+                              icon: const Icon(Icons.keyboard_arrow_down),
+
+                              // Array list of items
+                              items: categories.map((String categories) {
+                                return DropdownMenuItem(
+                                  value: categories,
+                                  child: Text(categories),
+                                );
+                              }).toList(),
+                              // After selecting the desired option,it will
+                              // change button value to selected value
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  dropdownCategory = newValue!;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ]),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
               ElevatedButton(
                 onPressed: () async {
                   setState(() {
@@ -408,8 +611,10 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                         _itemNameController.text.trim(),
                         _priceController.text.trim(),
                         dateinput.text.trim(),
-                        daysBetween.trim(),
-                        CPDCalculator());
+                        endDateInput.text.trim(),
+                        duration.trim(),
+                        CPDCalculator(),
+                        dropdownCategory);
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Transaction has been added!')));
