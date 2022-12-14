@@ -29,17 +29,15 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
   final monthYear = DateFormat('MMMM y').format(DateTime.now());
   final year = DateFormat('y').format(DateTime.now());
   final userID = FirebaseAuth.instance.currentUser?.uid;
+
   String dropdownCategory = "No Category";
 
   var categories = [
     'No Category',
-    'Entertainment',
     'Food',
-    'Personal',
-    'Shopping',
     'Subscriptions',
-    'Tech',
     'Travel',
+    'Tech',
     'Utilities',
   ];
 
@@ -90,7 +88,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
             'itemDate': purchaseDate,
             'endDate': endDate,
             'duration': duration,
-            //'costPerDay': costPerDay,
+            'costPerDay': costPerDay,
             'category': itemCategory,
           },
         ],
@@ -131,7 +129,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
             //'daysBetween': daysBetween, //this is kinda useless since calculation is done later
             'endDate': endDate,
             'duration': duration,
-            //'costPerDay': costPerDay,
+            'costPerDay': costPerDay,
             'category': itemCategory,
           },
         ],
@@ -504,8 +502,8 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                                   },
                                   context: context,
                                   initialDate: DateTime.now(),
-                                  firstDate: DateTime
-                                      .now(), //Not to allow to choose before today.
+                                  firstDate: DateTime(
+                                      2000), //DateTime.now() - not to allow to choose before today.
                                   lastDate: DateTime(2200));
 
                               if (pickedEndDate != null) {
@@ -520,7 +518,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                                 String formattedDate = DateFormat('yyyy-MM-dd')
                                     .format(pickedEndDate);
                                 int duration = int.parse(difference) + 1;
-                                //print(duration);
+                                print(duration);
                                 // print(
                                 //     formattedDate); //formatted date output using intl package =>  2021-03-16
                                 //you can implement different kind of Date Format here according to your requirement

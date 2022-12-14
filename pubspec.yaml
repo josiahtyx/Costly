@@ -48,6 +48,7 @@ dependencies:
   flutter_cache_manager: ^3.3.0
   liquid_pull_to_refresh: ^3.0.1
   flutter_svg: ^1.1.5
+  flutter_colorpicker: ^1.0.3
 
 
 dev_dependencies:

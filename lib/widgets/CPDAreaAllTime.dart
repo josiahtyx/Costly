@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:costlynew/data/data.dart';
+import '../data/data.dart';
 
-var funcCPD = GetCPDTotal();
-var funcSpent = GetTotalSpent();
+var funcCPD = GetCPDTotalYearly();
+var funcSpent = GetTotalSpentYearly();
 
-class CPDArea extends StatefulWidget {
-  const CPDArea({Key? key}) : super(key: key);
+class CPDAreaYearly extends StatefulWidget {
+  const CPDAreaYearly({Key? key}) : super(key: key);
 
   @override
-  State<CPDArea> createState() => _CPDAreaState();
+  State<CPDAreaYearly> createState() => _CPDAreaYearlyState();
 }
 
-class _CPDAreaState extends State<CPDArea> {
+class _CPDAreaYearlyState extends State<CPDAreaYearly> {
   late Future<double> totalCPD;
   late Future<double> totalSpent;
   DateTime dateNow = DateTime.now();
-  DateTime firstDay = DateTime(DateTime.now().year, DateTime.now().month, 1);
+  DateTime firstDay = DateTime(DateTime.now().year, 1, 1);
   late int daysBetween;
 
   int GetDaysDifference() {
@@ -52,14 +52,7 @@ class _CPDAreaState extends State<CPDArea> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.black,
-        image: DecorationImage(
-          image: AssetImage('assets/images/waves.png'),
-          //colorFilter: ColorFilter.mode(Colors.white, BlendMode.screen),
-          fit: BoxFit.cover,
-        ),
-      ),
+      decoration: BoxDecoration(color: Colors.black),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(40, 20, 40, 40),
         child: Center(
@@ -68,31 +61,6 @@ class _CPDAreaState extends State<CPDArea> {
               SizedBox(
                 height: 20,
               ),
-              // FutureBuilder(
-              //   future: totalSpent,
-              //   builder: (context, snapshot) {
-              //     if (snapshot.hasData) {
-              //       return Text(
-              //         'Total expenses: ${snapshot.data}€',
-              //         textAlign: TextAlign.center,
-              //         style: TextStyle(
-              //           color: Colors.white,
-              //           fontSize: 30,
-              //           fontWeight: FontWeight.w400,
-              //         ),
-              //       );
-              //     } else {
-              //       return Text(
-              //         '0,00€',
-              //         style: TextStyle(
-              //           color: Colors.white,
-              //           fontSize: 30,
-              //           fontWeight: FontWeight.w400,
-              //         ),
-              //       );
-              //     }
-              //   },
-              // ),
               FutureBuilder(
                 future: totalSpent,
                 builder: (context, snapshot) {
@@ -100,7 +68,7 @@ class _CPDAreaState extends State<CPDArea> {
                     return Column(
                       children: [
                         Text(
-                          'Your CPD in $month:',
+                          'Total expenses: ',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
@@ -109,7 +77,8 @@ class _CPDAreaState extends State<CPDArea> {
                           ),
                         ),
                         Text(
-                          ('${calculateCPD(snapshot.data).replaceAll(RegExp(r'\.'), ',')}€'),
+                          ('${snapshot.data}€'),
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 30,
@@ -119,9 +88,8 @@ class _CPDAreaState extends State<CPDArea> {
                       ],
                     );
                   } else {
-                    //put loading here
                     return Text(
-                      'Your CPD in $month: + \n0,00€',
+                      '',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 30,
@@ -131,6 +99,52 @@ class _CPDAreaState extends State<CPDArea> {
                   }
                 },
               ),
+
+              //TODO: Sum of all transaction's CPD
+              // FutureBuilder(
+              //   future: totalSpent,
+              //   builder: (context, snapshot) {
+              //     if (snapshot.hasData) {
+              //       return Column(
+              //         children: [
+              //           Text(
+              //             'Your total CPD this year:',
+              //             textAlign: TextAlign.center,
+              //             style: GoogleFonts.nunito(
+              //               textStyle: TextStyle(
+              //                 color: Colors.white,
+              //                 fontSize: 30,
+              //                 fontWeight: FontWeight.w400,
+              //               ),
+              //             ),
+              //           ),
+              //           Text(
+              //             (calculateCPD(snapshot.data) + '€'),
+              //             style: GoogleFonts.nunito(
+              //               textStyle: TextStyle(
+              //                 color: Colors.white,
+              //                 fontSize: 30,
+              //                 fontWeight: FontWeight.w400,
+              //               ),
+              //             ),
+              //           ),
+              //         ],
+              //       );
+              //     } else {
+              //       //put loading here
+              //       return Text(
+              //         '',
+              //         style: GoogleFonts.nunito(
+              //           textStyle: TextStyle(
+              //             color: Colors.white,
+              //             fontSize: 30,
+              //             fontWeight: FontWeight.w400,
+              //           ),
+              //         ),
+              //       );
+              //     }
+              //   },
+              // ),
             ],
           ),
         ),

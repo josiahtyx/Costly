@@ -1,5 +1,5 @@
-import 'package:costlynew/pages/loginpage.dart';
-import 'package:costlynew/pages/registerpage.dart';
+import 'package:costlynew/pages/login.dart';
+import 'package:costlynew/pages/registration.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
