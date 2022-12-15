@@ -610,20 +610,25 @@ class _TransactionsAreaYearlyState extends State<TransactionsAreaYearly> {
 
   late Future<List<dynamic>> transactionsDataMonth;
   late Future<List<dynamic>> transactionsDataYear;
-
+  late bool _isLoading;
   // Future<void> _handleRefresh() async {
   //   await userTransactionsYearly;
   // }
 
+  void wait() async {
+    funcGetYear.getTransactions();
+    transactionsDataYear = funcGetYear.getTransactions();
+    // Future.delayed(const Duration(seconds: 5), () {
+    //   setState(() {
+    //     _isLoading = false;
+    //   }); // Prints after 1 second.
+    // });
+  }
+
   @override
   void initState() {
     super.initState();
-
-    //This part needs to be updated to be manual or something
-    funcGetYear.getTransactions();
-    transactionsDataYear = funcGetYear.getTransactions();
-    // getCPDtotal();
-    // totalCPD = getCPDtotal();
+    wait();
   }
 
   _loadData() async {

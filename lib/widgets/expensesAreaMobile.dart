@@ -319,18 +319,27 @@ class _TransactionsAreaState extends State<TransactionsArea> {
 
   late Future<List<dynamic>> transactionsDataMonth;
   late Future<List<dynamic>> transactionsDataYear;
-
+  late bool _isLoading;
   // Future<void> _handleRefresh() async {
   //   await userTransactions;
   // }
 
+  void wait() async {
+    funcGet.getTransactions();
+    transactionsDataMonth = funcGet.getTransactions();
+    // Future.delayed(const Duration(seconds: 5), () {
+    //   setState(() {
+    //     _isLoading = false;
+    //   }); // Prints after 1 second.
+    // });
+  }
+
   @override
   void initState() {
     super.initState();
-
+    wait();
     //This part needs to be updated to be manual or something
-    funcGet.getTransactions();
-    transactionsDataMonth = funcGet.getTransactions();
+
     // getCPDtotal();
     // totalCPD = getCPDtotal();
   }
@@ -511,61 +520,114 @@ class _TransactionsAreaState extends State<TransactionsArea> {
                               onTap: () {
                                 showDetails(
                                   context,
-                                  (userTransactionsYearly[index]['category'])
+                                  (userTransactions[index]['category'])
                                       .toString(),
-                                  (userTransactionsYearly[index]['costPerDay'])
+                                  (userTransactions[index]['costPerDay'])
                                       .toString(),
-                                  (userTransactionsYearly[index]['duration'])
+                                  (userTransactions[index]['duration'])
                                       .toString(),
-                                  (userTransactionsYearly[index]['endDate'])
+                                  (userTransactions[index]['endDate'])
                                       .toString(),
-                                  (userTransactionsYearly[index]['itemDate'])
+                                  (userTransactions[index]['itemDate'])
                                       .toString(),
-                                  (userTransactionsYearly[index]['itemName'])
+                                  (userTransactions[index]['itemName'])
                                       .toString(),
-                                  (userTransactionsYearly[index]['itemPrice'])
+                                  (userTransactions[index]['itemPrice'])
                                       .toString(),
                                 );
                               },
                               child: Dismissible(
                                 key: Key(item),
+                                background: Container(
+                                  color: Colors.amber[700],
+                                  padding: EdgeInsets.symmetric(horizontal: 20),
+                                  alignment: AlignmentDirectional.centerStart,
+                                  child: Icon(
+                                    Icons.archive,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                secondaryBackground: Container(
+                                    color: Colors.red,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    alignment: AlignmentDirectional.centerEnd,
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.white,
+                                    )),
                                 // Provide a function that tells the app
                                 // what to do after an item has been swiped away.
                                 onDismissed: (direction) async {
-                                  delTransaction(
-                                    (userTransactionsYearly[index]['category'])
-                                        .toString(),
-                                    // (userTransactionsYearly[index]
-                                    //         ['costPerDay'])
-                                    //     .toString(),
-                                    (userTransactionsYearly[index]['duration'])
-                                        .toString(),
-                                    (userTransactionsYearly[index]['endDate'])
-                                        .toString(),
-                                    (userTransactionsYearly[index]['itemDate'])
-                                        .toString(),
-                                    (userTransactionsYearly[index]['itemName'])
-                                        .toString(),
-                                    (userTransactionsYearly[index]['itemPrice'])
-                                        .toString(),
-                                  );
-                                  // Remove the item from the data source.
-                                  setState(() {
-                                    userTransactions.removeAt(index);
-                                  });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              'Transaction has been deleted! Please refresh the page!')));
-                                  await Future.delayed(Duration(seconds: 1));
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const HomePage()),
-                                  );
+                                  if (direction ==
+                                      DismissDirection.startToEnd) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                '${userTransactions[index]['itemName']} has been archived.')));
+                                    archiveTransaction(
+                                      (userTransactions[index]['category'])
+                                          .toString(),
+                                      // (userTransactions[index]['costPerDay'])
+                                      //     .toString(),
+                                      (userTransactions[index]['duration'])
+                                          .toString(),
+                                      (userTransactions[index]['endDate'])
+                                          .toString(),
+                                      (userTransactions[index]['itemDate'])
+                                          .toString(),
+                                      (userTransactions[index]['itemName'])
+                                          .toString(),
+                                      (userTransactions[index]['itemPrice'])
+                                          .toString(),
+                                    );
+                                    setState(() {
+                                      userTransactions.removeAt(index);
+                                    });
+
+                                    await Future.delayed(Duration(seconds: 1));
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const HomePage()),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                '${userTransactions[index]['itemName']} has been deleted.')));
+                                    delTransaction(
+                                      (userTransactions[index]['category'])
+                                          .toString(),
+                                      // (userTransactions[index]['costPerDay'])
+                                      //     .toString(),
+                                      (userTransactions[index]['duration'])
+                                          .toString(),
+                                      (userTransactions[index]['endDate'])
+                                          .toString(),
+                                      (userTransactions[index]['itemDate'])
+                                          .toString(),
+                                      (userTransactions[index]['itemName'])
+                                          .toString(),
+                                      (userTransactions[index]['itemPrice'])
+                                          .toString(),
+                                    );
+                                    // Remove the item from the data source.
+                                    setState(() {
+                                      userTransactions.removeAt(index);
+                                    });
+
+                                    await Future.delayed(Duration(seconds: 1));
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const HomePage()),
+                                    );
+                                  }
                                   // Then show a snackbar.
                                 },
-                                background: Container(color: Colors.orange[50]),
                                 child: Padding(
                                   padding: const EdgeInsets.all(5.0),
                                   child: ListTile(

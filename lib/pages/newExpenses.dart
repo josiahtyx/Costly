@@ -256,12 +256,15 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 20.0),
                           child: TextField(
-                            controller: _itemNameController,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Item Name',
-                            ),
-                          ),
+                              controller: _itemNameController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'Item Name',
+                              ),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp("[a-zA-Z0-9_ ]")),
+                              ]),
                         ),
                       ),
                     ),

@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'package:costlynew/data/data.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 
 var funcGet = new GetTransactions();
 var funcGetYear = new GetTransactionsYearly();
@@ -418,17 +419,11 @@ class _TransactionsAreaState extends State<TransactionsArea> {
   void initState() {
     super.initState();
     themeColor = getProfileColor();
-    //This part needs to be updated to be manual or something
-    funcGet.getTransactions();
-    transactionsDataMonth = funcGet.getTransactions();
-    // getCPDtotal();
-    // totalCPD = getCPDtotal();
   }
 
   _loadData() async {
     await funcGet.getTransactions();
     transactionsDataMonth = funcGet.getTransactions();
-    //print(transactionsDataMonth.toString());
   }
 
   @override

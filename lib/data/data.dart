@@ -68,6 +68,12 @@ List<dynamic> userTransactionsYearly = [];
 //                               MaterialPageRoute(
 //                                   builder: (context) => const HomePageYearly()),
 //                             );
+int daysInMonth() {
+  DateTime now = new DateTime.now();
+  DateTime lastDayOfMonth = new DateTime(now.year, now.month + 1, 0);
+  //print("N days: ${lastDayOfMonth.day}");
+  return lastDayOfMonth.day;
+}
 
 class GetTransactions {
   Future<List<dynamic>> getTransactions() async {
@@ -425,4 +431,11 @@ class GetTotalSpentYearly {
 Future delAllData(String userID) async {
   await db.collection('userData').doc(userID).delete();
   user.delete();
+}
+
+Future delColor(String userID) async {
+  await db
+      .collection('userData')
+      .doc(userID)
+      .update({'themeColor': FieldValue.delete()});
 }

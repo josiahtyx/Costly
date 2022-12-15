@@ -36,15 +36,25 @@ class _CPDAreaYearlyState extends State<CPDAreaYearly> {
     await totalCPD;
   }
 
-  @override
-  void initState() {
-    super.initState();
+  late bool _isLoading;
+  void wait() async {
     GetDaysDifference();
     //This part needs to be updated to be manual or something
     funcCPD.getCPDtotal();
     totalCPD = funcCPD.getCPDtotal();
     funcSpent.getTotalSpent();
     totalSpent = funcSpent.getTotalSpent();
+    Future.delayed(const Duration(seconds: 5), () {
+      setState(() {
+        _isLoading = false;
+      }); // Prints after 1 second.
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    wait();
     // getCPDtotal();
     // totalCPD = getCPDtotal();
   }

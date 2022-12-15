@@ -20,6 +20,8 @@ class DesktopPage extends StatefulWidget {
 class _DesktopPageState extends State<DesktopPage> {
   final user = FirebaseAuth.instance.currentUser!;
   final db = FirebaseFirestore.instance;
+  late Future<List<dynamic>> transactionsDataMonth;
+  late bool _isLoading;
 
   @override
   Widget build(BuildContext context) {

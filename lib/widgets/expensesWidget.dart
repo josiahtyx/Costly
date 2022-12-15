@@ -29,17 +29,28 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
   int listLength = 1;
   late int daysBetween;
   late Future<String> themeColor;
-
+  late bool _isLoading;
   // Future<void> _handleRefresh() async {
   //   await userTransactions;
   // }
 
+  void wait() async {
+    _isLoading = true;
+    funcGet.getTransactions();
+    transactionsDataMonth = funcGet.getTransactions();
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {
+        _isLoading = false;
+      }); // Prints after 1 second.
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    wait();
     //This part needs to be updated to be manual or something
-    funcGet.getTransactions();
-    transactionsDataMonth = funcGet.getTransactions();
+
     // getCPDtotal();
     // totalCPD = getCPDtotal();
   }
@@ -474,198 +485,301 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
     return Container(
       width: device.width * 0.63,
       height: device.height * 0.45,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              child: FutureBuilder(
-                  future: transactionsDataMonth,
-                  builder: (context, snapshot) {
-                    return ListView.builder(
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: userTransactions.length,
-                      itemBuilder: ((context, index) {
-                        final item = userTransactions[index].toString();
+      child: _isLoading
+          ? ListView.separated(
+              itemBuilder: ((context, index) => const AsyncBarRow()),
+              separatorBuilder: ((context, index) => SizedBox(
+                    height: 0,
+                  )),
+              itemCount: 10)
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    child: FutureBuilder(
+                        future: transactionsDataMonth,
+                        builder: (context, snapshot) {
+                          return ListView.builder(
+                            physics: BouncingScrollPhysics(),
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            itemCount: userTransactions.length,
+                            itemBuilder: ((context, index) {
+                              final item = userTransactions[index].toString();
 
-                        return GestureDetector(
-                          onTap: () {
-                            showDetails(
-                              context,
-                              (userTransactions[index]['category']).toString(),
-                              (userTransactions[index]['costPerDay'])
-                                  .toString(),
-                              (userTransactions[index]['duration']).toString(),
-                              (userTransactions[index]['endDate']).toString(),
-                              (userTransactions[index]['itemDate']).toString(),
-                              (userTransactions[index]['itemName']).toString(),
-                              (userTransactions[index]['itemPrice']).toString(),
-                            );
-                          },
-                          child: Dismissible(
-                            key: Key(item),
-                            background: Container(
-                              color: Colors.amber[700],
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              alignment: AlignmentDirectional.centerStart,
-                              child: Icon(
-                                Icons.archive,
-                                color: Colors.white,
-                              ),
-                            ),
-                            secondaryBackground: Container(
-                                color: Colors.red,
-                                padding: EdgeInsets.symmetric(horizontal: 20),
-                                alignment: AlignmentDirectional.centerEnd,
-                                child: Icon(
-                                  Icons.delete,
-                                  color: Colors.white,
-                                )),
-                            // Provide a function that tells the app
-                            // what to do after an item has been swiped away.
-                            onDismissed: (direction) async {
-                              if (direction == DismissDirection.startToEnd) {
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    content: Text(
-                                        '${userTransactions[index]['itemName']} + "has been " archived.')));
-                                archiveTransaction(
-                                  (userTransactions[index]['category'])
-                                      .toString(),
-                                  // (userTransactions[index]['costPerDay'])
-                                  //     .toString(),
-                                  (userTransactions[index]['duration'])
-                                      .toString(),
-                                  (userTransactions[index]['endDate'])
-                                      .toString(),
-                                  (userTransactions[index]['itemDate'])
-                                      .toString(),
-                                  (userTransactions[index]['itemName'])
-                                      .toString(),
-                                  (userTransactions[index]['itemPrice'])
-                                      .toString(),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    content: Text(
-                                        '${userTransactions[index]['itemName']} has been deleted.')));
-                                delTransaction(
-                                  (userTransactions[index]['category'])
-                                      .toString(),
-                                  // (userTransactions[index]['costPerDay'])
-                                  //     .toString(),
-                                  (userTransactions[index]['duration'])
-                                      .toString(),
-                                  (userTransactions[index]['endDate'])
-                                      .toString(),
-                                  (userTransactions[index]['itemDate'])
-                                      .toString(),
-                                  (userTransactions[index]['itemName'])
-                                      .toString(),
-                                  (userTransactions[index]['itemPrice'])
-                                      .toString(),
-                                );
-                                // Remove the item from the data source.
-                                setState(() {
-                                  userTransactions.removeAt(index);
-                                });
-
-                                await Future.delayed(Duration(seconds: 1));
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const HomePage()),
-                                );
-                              }
-
-                              // Then show a snackbar.
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: ListTile(
-                                title: Text(
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w700,
-                                    ),
+                              return GestureDetector(
+                                onTap: () {
+                                  showDetails(
+                                    context,
+                                    (userTransactions[index]['category'])
+                                        .toString(),
+                                    (userTransactions[index]['costPerDay'])
+                                        .toString(),
+                                    (userTransactions[index]['duration'])
+                                        .toString(),
+                                    (userTransactions[index]['endDate'])
+                                        .toString(),
+                                    (userTransactions[index]['itemDate'])
+                                        .toString(),
                                     (userTransactions[index]['itemName'])
-                                        .toString()),
-                                // subtitle: Text(('Item Price: ' +
-                                //         userTransactions[index]['itemPrice']
-                                //             .replaceAll(RegExp(r'\.'), ',') +
-                                //         '€' +
-                                //         '\nPurchase Date: ' +
-                                //         userTransactions[index]['itemDate'] +
-                                //         '')
-                                //     .toString()),
-                                trailing: Wrap(
-                                  spacing: 0, // space between two icons
-                                  children: <Widget>[
-                                    categoryButton(
-                                        userTransactions[index]['category']),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 78.0),
-                                      child: SizedBox(
-                                        width: 100,
-                                        child: Text(
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                          ((calculateCPD(
-                                                      (userTransactions[index]
-                                                          ['itemDate']),
-                                                      (userTransactions[index]
-                                                          ['itemPrice'])))
-                                                  .toString()
-                                                  .replaceAll(
-                                                      RegExp(r'\.'), ',') +
-                                              "€" +
-                                              "/" +
-                                              daysBetween.toString() +
-                                              "d"), // icon-1
-                                          // Icon(Icons.delete), // icon-2
-                                        ),
-                                      ),
+                                        .toString(),
+                                    (userTransactions[index]['itemPrice'])
+                                        .toString(),
+                                  );
+                                },
+                                child: Dismissible(
+                                  key: Key(item),
+                                  background: Container(
+                                    color: Colors.amber[700],
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    alignment: AlignmentDirectional.centerStart,
+                                    child: Icon(
+                                      Icons.archive,
+                                      color: Colors.white,
                                     ),
-                                    Padding(
+                                  ),
+                                  secondaryBackground: Container(
+                                      color: Colors.red,
                                       padding:
-                                          const EdgeInsets.only(left: 55.0),
-                                      child: SizedBox(
-                                        width: 100,
-                                        child: Text(
-                                            textAlign: TextAlign.center,
+                                          EdgeInsets.symmetric(horizontal: 20),
+                                      alignment: AlignmentDirectional.centerEnd,
+                                      child: Icon(
+                                        Icons.delete,
+                                        color: Colors.white,
+                                      )),
+                                  // Provide a function that tells the app
+                                  // what to do after an item has been swiped away.
+                                  onDismissed: (direction) async {
+                                    if (direction ==
+                                        DismissDirection.startToEnd) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              content: Text(
+                                                  '${userTransactions[index]['itemName']} has been archived.')));
+                                      archiveTransaction(
+                                        (userTransactions[index]['category'])
+                                            .toString(),
+                                        // (userTransactions[index]['costPerDay'])
+                                        //     .toString(),
+                                        (userTransactions[index]['duration'])
+                                            .toString(),
+                                        (userTransactions[index]['endDate'])
+                                            .toString(),
+                                        (userTransactions[index]['itemDate'])
+                                            .toString(),
+                                        (userTransactions[index]['itemName'])
+                                            .toString(),
+                                        (userTransactions[index]['itemPrice'])
+                                            .toString(),
+                                      );
+                                      setState(() {
+                                        userTransactions.removeAt(index);
+                                      });
+
+                                      await Future.delayed(
+                                          Duration(seconds: 1));
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomePage()),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              content: Text(
+                                                  '${userTransactions[index]['itemName']} has been deleted.')));
+                                      delTransaction(
+                                        (userTransactions[index]['category'])
+                                            .toString(),
+                                        // (userTransactions[index]['costPerDay'])
+                                        //     .toString(),
+                                        (userTransactions[index]['duration'])
+                                            .toString(),
+                                        (userTransactions[index]['endDate'])
+                                            .toString(),
+                                        (userTransactions[index]['itemDate'])
+                                            .toString(),
+                                        (userTransactions[index]['itemName'])
+                                            .toString(),
+                                        (userTransactions[index]['itemPrice'])
+                                            .toString(),
+                                      );
+                                      // Remove the item from the data source.
+                                      setState(() {
+                                        userTransactions.removeAt(index);
+                                      });
+
+                                      await Future.delayed(
+                                          Duration(seconds: 1));
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomePage()),
+                                      );
+                                    }
+
+                                    // Then show a snackbar.
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: ListTile(
+                                        title: Text(
                                             style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 20,
                                               fontWeight: FontWeight.w700,
                                             ),
-                                            ((userTransactions[index]
-                                                        ['itemPrice']))
-                                                    .toString()
-                                                    .replaceAll(
-                                                        RegExp(r'\.'), ',') +
-                                                "€"),
+                                            (userTransactions[index]
+                                                    ['itemName'])
+                                                .toString()),
+                                        // subtitle: Text(('Item Price: ' +
+                                        //         userTransactions[index]['itemPrice']
+                                        //             .replaceAll(RegExp(r'\.'), ',') +
+                                        //         '€' +
+                                        //         '\nPurchase Date: ' +
+                                        //         userTransactions[index]['itemDate'] +
+                                        //         '')
+                                        //     .toString()),
+                                        trailing: Wrap(
+                                          spacing: 0, // space between two icons
+                                          children: <Widget>[
+                                            categoryButton(
+                                                userTransactions[index]
+                                                    ['category']),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 78.0),
+                                              child: SizedBox(
+                                                width: 100,
+                                                child: Text(
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                  ((calculateCPD(
+                                                              (userTransactions[
+                                                                      index]
+                                                                  ['itemDate']),
+                                                              (userTransactions[
+                                                                      index][
+                                                                  'itemPrice'])))
+                                                          .toString()
+                                                          .replaceAll(
+                                                              RegExp(r'\.'),
+                                                              ',') +
+                                                      "€" +
+                                                      "/" +
+                                                      daysBetween.toString() +
+                                                      "d"), // icon-1
+                                                  // Icon(Icons.delete), // icon-2
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 55.0),
+                                              child: SizedBox(
+                                                width: 100,
+                                                child: Text(
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
+                                                    ((userTransactions[index]
+                                                                ['itemPrice']))
+                                                            .toString()
+                                                            .replaceAll(
+                                                                RegExp(r'\.'),
+                                                                ',') +
+                                                        "€"),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                    );
-                  }),
+                              );
+                            }),
+                          );
+                        }),
+                  )
+                ],
+              ),
+            ),
+    );
+  }
+}
+
+class AsyncBarRow extends StatelessWidget {
+  const AsyncBarRow({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final device = MediaQuery.of(context).size;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(35, 35, 35, 20),
+      child: Container(
+        child: Row(
+          children: [
+            Expanded(child: AsyncBar()),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(160, 0, 35, 0),
+              child: AsyncBar(
+                width: 130,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(38, 0, 5, 0),
+              child: AsyncBar(
+                width: 110,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(55, 0, 8.0, 0),
+              child: AsyncBar(
+                width: 80,
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class AsyncBar extends StatelessWidget {
+  const AsyncBar({
+    Key? key,
+    this.height,
+    this.width,
+  }) : super(key: key);
+
+  final double? height, width;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      width: width,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.1),
+          borderRadius: const BorderRadius.all(Radius.circular(16))),
     );
   }
 }

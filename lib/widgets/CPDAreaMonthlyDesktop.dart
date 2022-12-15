@@ -20,13 +20,7 @@ class _CPDAreaState extends State<CPDArea> {
   DateTime dateNow = DateTime.now();
   DateTime firstDay = DateTime(DateTime.now().year, DateTime.now().month, 1);
   late int daysBetween;
-
-  int daysInMonth() {
-    DateTime now = new DateTime.now();
-    DateTime lastDayOfMonth = new DateTime(now.year, now.month + 1, 0);
-    //print("N days: ${lastDayOfMonth.day}");
-    return lastDayOfMonth.day;
-  }
+  late bool _isLoading;
 
   int GetDaysDifference() {
     int dateDifference = ((DateTime.now().difference(firstDay).inDays) + 1);
@@ -48,19 +42,28 @@ class _CPDAreaState extends State<CPDArea> {
     await totalCPD;
   }
 
-  @override
-  void initState() {
-    super.initState();
+  void wait() async {
+    _isLoading = true;
     GetDaysDifference();
-    //This part needs to be updated to be manual or something
     funcCPD.getCPDtotal();
     totalCPD = funcCPD.getCPDtotal();
     funcSpent.getTotalSpent();
     totalSpent = funcSpent.getTotalSpent();
-    setState(() {});
+    //setState(() {});
     // getCPDtotal();
     // totalCPD = getCPDtotal();
     daysInMonth();
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    wait();
   }
 
   @override
@@ -75,30 +78,52 @@ class _CPDAreaState extends State<CPDArea> {
             future: totalSpent,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Your total CPD in ' + month + ':',
-                      style: GoogleFonts.nunito(
-                        color: Colors.white,
-                        fontSize: device.width * 0.025,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    Text(
-                      (calculateCPD(snapshot.data)
-                              .replaceAll(RegExp(r'\.'), ',') +
-                          '€'),
-                      style: GoogleFonts.nunito(
-                        color: Colors.white,
-                        fontSize: device.width * 0.04,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
-                );
+                return _isLoading
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Your total CPD in ' + month + ':',
+                            style: GoogleFonts.nunito(
+                              color: Colors.white,
+                              fontSize: device.width * 0.025,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            ('0,00€'),
+                            style: GoogleFonts.nunito(
+                              color: Colors.white,
+                              fontSize: device.width * 0.04,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Your total CPD in ' + month + ':',
+                            style: GoogleFonts.nunito(
+                              color: Colors.white,
+                              fontSize: device.width * 0.025,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            (calculateCPD(snapshot.data)
+                                    .replaceAll(RegExp(r'\.'), ',') +
+                                '€'),
+                            style: GoogleFonts.nunito(
+                              color: Colors.white,
+                              fontSize: device.width * 0.04,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      );
               } else {
                 //put loading here
                 return Column(

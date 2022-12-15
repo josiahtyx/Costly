@@ -20,12 +20,23 @@ class AssetsArea extends StatefulWidget {
 
 class _AssetsAreaState extends State<AssetsArea> {
   late Future<double> totalSpent;
+  late bool _isLoading;
+
+  void wait() async {
+    _isLoading = true;
+    funcSpent.getTotalSpent();
+    totalSpent = funcSpent.getTotalSpent();
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {
+        _isLoading = false;
+      }); // Prints after 1 second.
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-
-    funcSpent.getTotalSpent();
-    totalSpent = funcSpent.getTotalSpent();
+    wait();
     // getCPDtotal();
     // totalCPD = getCPDtotal();
   }
@@ -65,15 +76,24 @@ class _AssetsAreaState extends State<AssetsArea> {
                 future: totalSpent,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    return Text(
-                      '${snapshot.data}€'.replaceAll(RegExp(r'\.'), ','),
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.nunito(
-                        color: Colors.black,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    );
+                    return _isLoading
+                        ? Text(
+                            '0,00€',
+                            style: GoogleFonts.nunito(
+                              color: Colors.black,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          )
+                        : Text(
+                            '${snapshot.data}€'.replaceAll(RegExp(r'\.'), ','),
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.nunito(
+                              color: Colors.black,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          );
                   } else {
                     return Text(
                       '0,00€',

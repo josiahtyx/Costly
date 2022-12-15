@@ -185,13 +185,41 @@ class _AccountPageState extends State<AccountPage> {
             ),
             actions: <Widget>[
               ElevatedButton(
-                child: const Text('Got it'),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.orange[800], // background
+                  onPrimary: Colors.white, // foreground
+                ),
+                child: Text('Reset'),
+                onPressed: () {
+                  setState(() {
+                    delColor(userID.toString());
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AccountPage()),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Color theme has been resetted.'),
+                      ),
+                    );
+
+                    // changeProfilePic(url);
+                  });
+                },
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.grey[600], // background
+                  onPrimary: Colors.white, // foreground
+                ),
+                child: const Text('OK'),
                 onPressed: () {
                   setState(() => currentColor = pickerColor);
                   changeProfileColor(pickerColor.value.toRadixString(16));
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Theme Color changed'),
+                      content: Text('Theme color has been changed'),
                     ),
                   );
                   Navigator.push(
@@ -359,8 +387,20 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    final device = MediaQuery.of(context).size;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth > 1480) {
+          return profileDesktop(context);
+        } else {
+          return profileMobile(context);
+        }
+      },
+    );
+  }
 
+  @override
+  Widget profileDesktop(BuildContext context) {
+    final device = MediaQuery.of(context).size;
     return FutureBuilder(
       future: themeColor,
       builder: (context, snapshot) {
@@ -683,6 +723,366 @@ class _AccountPageState extends State<AccountPage> {
               ),
             ),
           );
+        }
+      },
+    );
+  }
+
+  @override
+  Widget profileMobile(BuildContext context) {
+    final device = MediaQuery.of(context).size;
+    return FutureBuilder(
+      future: themeColor,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Scaffold(
+              backgroundColor: Color(int.parse(snapshot.data.toString())),
+              // appBar: AppBar(
+              //   title: Text('Profile Page'),
+              //   backgroundColor: Colors.black,
+              //   automaticallyImplyLeading: false,
+              // ),
+              body: Center(
+                child: SingleChildScrollView(
+                  child: Container(
+                    height: device.height * 0.85,
+                    width: device.width * 0.8,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 5,
+                          blurRadius: 30,
+                          offset: Offset(0, 0), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(30.0),
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: device.width * 0.05,
+                                  child: IconButton(
+                                    icon: const Icon(
+                                        Icons.arrow_back_ios_new_rounded),
+                                    tooltip: 'Back',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomePage()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 45),
+                                  child: Text(
+                                    'Profile Page',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: device.width * 0.06,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: device.height * 0.06,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 12.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      _displayTextInputDialog(context);
+                                    },
+                                    child: buildProfileImage(url),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+
+                                  Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: Text(
+                                      '${user.email!}',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: device.width * 0.05,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  colorButton(),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          primary: Colors.orange[800],
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ) // Background color
+                                          ),
+                                      onPressed: (() {
+                                        forgotPassword();
+                                      }),
+                                      child: Text('Change Password')),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          primary: Colors.orange[800],
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ) // Background color
+                                          ),
+                                      onPressed: (() {
+                                        confirmDeleteTransactions(context);
+                                      }),
+                                      child: Text('Delete All Data')),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          primary: Colors.orange[800],
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ) // Background color
+                                          ),
+                                      onPressed: (() async {
+                                        FirebaseAuth.instance.signOut();
+                                        await DefaultCacheManager()
+                                            .emptyCache();
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const MainPage()),
+                                        );
+                                      }),
+                                      child: Text('Log Out')),
+
+                                  //delete account
+                                  // Padding(
+                                  //   padding: const EdgeInsets.only(top: 10),
+                                  //   child: ElevatedButton(
+                                  //       style: ElevatedButton.styleFrom(
+                                  //           primary: Colors.red[800],
+                                  //           shape: RoundedRectangleBorder(
+                                  //             borderRadius: BorderRadius.circular(15),
+                                  //           ) // Background color
+                                  //           ),
+                                  //       onPressed: (() async {
+                                  //         delUser();
+                                  //         Navigator.push(
+                                  //           context,
+                                  //           MaterialPageRoute(builder: (context) => const MainPage()),
+                                  //         );
+                                  //       }),
+                                  //       child: Text('Delete Account')),
+                                  // ),],)
+                                ],
+                              ),
+                            ),
+                          ]),
+                    ),
+                  ),
+                ),
+              ));
+        } else {
+          return Scaffold(
+              //backgroundColor: Color(int.parse(snapshot.data.toString())),
+              // appBar: AppBar(
+              //   title: Text('Profile Page'),
+              //   backgroundColor: Colors.black,
+              //   automaticallyImplyLeading: false,
+              // ),
+              body: Center(
+            child: SingleChildScrollView(
+              child: Container(
+                height: device.height * 0.85,
+                width: device.width * 0.8,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      spreadRadius: 5,
+                      blurRadius: 30,
+                      offset: Offset(0, 0), // changes position of shadow
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(30.0),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: device.width * 0.05,
+                              child: IconButton(
+                                icon: const Icon(
+                                    Icons.arrow_back_ios_new_rounded),
+                                tooltip: 'Back',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const HomePage()),
+                                  );
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 45),
+                              child: Text(
+                                'Profile Page',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: device.width * 0.06,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: device.height * 0.06,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 12.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  _displayTextInputDialog(context);
+                                },
+                                child: buildProfileImage(url),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+
+                              Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Text(
+                                  '${user.email!}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.width * 0.05,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              colorButton(),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      primary: Colors.orange[800],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ) // Background color
+                                      ),
+                                  onPressed: (() {
+                                    forgotPassword();
+                                  }),
+                                  child: Text('Change Password')),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      primary: Colors.orange[800],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ) // Background color
+                                      ),
+                                  onPressed: (() {
+                                    confirmDeleteTransactions(context);
+                                  }),
+                                  child: Text('Delete All Data')),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      primary: Colors.orange[800],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ) // Background color
+                                      ),
+                                  onPressed: (() async {
+                                    FirebaseAuth.instance.signOut();
+                                    await DefaultCacheManager().emptyCache();
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const MainPage()),
+                                    );
+                                  }),
+                                  child: Text('Log Out')),
+
+                              //delete account
+                              // Padding(
+                              //   padding: const EdgeInsets.only(top: 10),
+                              //   child: ElevatedButton(
+                              //       style: ElevatedButton.styleFrom(
+                              //           primary: Colors.red[800],
+                              //           shape: RoundedRectangleBorder(
+                              //             borderRadius: BorderRadius.circular(15),
+                              //           ) // Background color
+                              //           ),
+                              //       onPressed: (() async {
+                              //         delUser();
+                              //         Navigator.push(
+                              //           context,
+                              //           MaterialPageRoute(builder: (context) => const MainPage()),
+                              //         );
+                              //       }),
+                              //       child: Text('Delete Account')),
+                              // ),],)
+                            ],
+                          ),
+                        ),
+                      ]),
+                ),
+              ),
+            ),
+          ));
         }
       },
     );
