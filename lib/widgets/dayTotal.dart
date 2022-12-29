@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import '../data/data.dart';
 
 var funcCPD = GetCPDTotalYearly();
-var funcSpent = GetTotalSpentYearly();
+var funcSpent = GetTotalSpentDaily();
 
-class CPDAreaYearly extends StatefulWidget {
-  const CPDAreaYearly({Key? key}) : super(key: key);
+class DayTotal extends StatefulWidget {
+  const DayTotal({Key? key}) : super(key: key);
 
   @override
-  State<CPDAreaYearly> createState() => _CPDAreaYearlyState();
+  State<DayTotal> createState() => _DayTotalState();
 }
 
-class _CPDAreaYearlyState extends State<CPDAreaYearly> {
+class _DayTotalState extends State<DayTotal> {
   late Future<double> totalCPD;
   late Future<double> totalSpent;
   DateTime dateNow = DateTime.now();
@@ -42,8 +42,8 @@ class _CPDAreaYearlyState extends State<CPDAreaYearly> {
     //This part needs to be updated to be manual or something
     funcCPD.getCPDtotal();
     totalCPD = funcCPD.getCPDtotal();
-    funcSpent.getTotalSpent();
-    totalSpent = funcSpent.getTotalSpent();
+    funcSpent.getTotalSpentDaily();
+    totalSpent = funcSpent.getTotalSpentDaily();
     // Future.delayed(const Duration(seconds: 5), () {
     //   setState(() {
     //     _isLoading = false;

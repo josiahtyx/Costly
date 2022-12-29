@@ -75,14 +75,12 @@ class _MobilePageState extends State<MobilePage> {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          child: Column(children: [
-            CPDArea(),
-            SizedBox(
-              height: 10,
-            ),
-            TransactionsArea()
-          ]),
-        ));
+        body: Column(children: [
+          CPDAreaMobile(),
+          SizedBox(
+            height: 10,
+          ),
+          TransactionsAreaMobile()
+        ]));
   }
 }

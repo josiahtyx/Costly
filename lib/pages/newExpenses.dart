@@ -507,8 +507,8 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                                   },
                                   context: context,
                                   initialDate: DateTime.now(),
-                                  firstDate: DateTime
-                                      .now(), //Not to allow to choose before today.
+                                  firstDate: DateTime.parse(pickedStartDate
+                                      .toString()), //Not to allow to choose before today.
                                   lastDate: DateTime(2200));
 
                               if (pickedEndDate != null) {

@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        print(constraints.maxWidth);
         if (constraints.maxWidth > 1480) {
           return DesktopPage();
         } else {

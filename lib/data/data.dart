@@ -10,10 +10,57 @@ final year = (DateFormat('y').format(DateTime.now())).toString();
 final month = (DateFormat('MMMM').format(DateTime.now())).toString();
 final monthYear = (DateFormat('MMMM y').format(DateTime.now())).toString();
 final userID = FirebaseAuth.instance.currentUser?.uid;
+DateTime? pickedDate;
 int listLength = 1;
 
 List<dynamic> userTransactions = [];
 List<dynamic> userTransactionsYearly = [];
+List<dynamic> userTransactionsDaily = [];
+List<dynamic> plannedPurchases = [];
+int getDaysBetweenNow(date) {
+  DateTime receivedDate = DateTime.parse(date);
+  int duration = ((DateTime.now().difference(receivedDate).inDays) + 1);
+  return duration;
+}
+
+Future addPlans(String itemName, String price, String duration) async {
+  await db
+      .collection('userData')
+      .doc(userID)
+      .collection('plans')
+      .doc('plannedPurchases')
+      .set({
+    'plannedPurchases': FieldValue.arrayUnion(
+      [
+        {
+          'itemName': itemName,
+          'itemPrice': price,
+          'duration': duration,
+        },
+      ],
+    ),
+  }, SetOptions(merge: true));
+}
+
+double calculateCPDnow(date, price) {
+  DateTime receivedDate = DateTime.parse(date);
+  int dateDifference = ((DateTime.now().difference(receivedDate).inDays) + 1);
+  // print(dateDifference
+  double receivedPrice =
+      double.parse(price); //then we take the price and turn it into a double
+  String cpdAmount = (receivedPrice / dateDifference).toStringAsFixed(2);
+  double newcpdAmount = double.parse(cpdAmount);
+  return newcpdAmount;
+}
+
+double calculateCPDfixed(duration, price) {
+  int durationD = int.parse(duration);
+  double receivedPrice =
+      double.parse(price); //then we take the price and turn it into a double
+  String cpdAmount = (receivedPrice / durationD).toStringAsFixed(2);
+  double newcpdAmount = double.parse(cpdAmount);
+  return newcpdAmount;
+}
 
 // class GetYearlyTransactions {
 //   Future<List<dynamic>> getYearlyTransactions() async {
@@ -73,6 +120,27 @@ int daysInMonth() {
   DateTime lastDayOfMonth = new DateTime(now.year, now.month + 1, 0);
   //print("N days: ${lastDayOfMonth.day}");
   return lastDayOfMonth.day;
+}
+
+class GetPlans {
+  Future<List<dynamic>> getPlans() async {
+    final plansRef = db
+        .collection('userData')
+        .doc(userID)
+        .collection('plans')
+        .doc('plannedPurchases');
+
+    DocumentSnapshot snapshot = await plansRef.get();
+    final data = snapshot.data() as Map<String, dynamic>;
+    // print(data['transactions']);
+    List list = (data['plannedPurchases']);
+    listLength = list.length;
+    plannedPurchases = list;
+    plannedPurchases..sort((a, b) => a['itemPrice'].compareTo(b['itemPrice']));
+    return plannedPurchases;
+    // callBack(listLength);
+    // print(listLength);
+  }
 }
 
 class GetTransactions {
@@ -340,7 +408,7 @@ class AddMonthField {
 
 var funcGet = new GetTransactions();
 var funcGetYear = new GetTransactionsYearly();
-
+var funcGetDaily = new GetTransactionsDaily();
 // String CPDCalculator(String itemPrice, date) {
 //   double price = double.parse(itemPrice.replaceAll(',', '.'));
 //   int theNumberofDaysBetween = int.parse(daysBetween);
@@ -404,7 +472,7 @@ class GetTotalSpentYearly {
     userTransactionsYearly = await funcGetYear.getTransactions();
 
     double Spentsum = 0;
-    for (var i = 0; i < userTransactions.length; i++) {
+    for (var i = 0; i < userTransactionsYearly.length; i++) {
       Spentsum =
           Spentsum + double.parse(userTransactionsYearly[i]['itemPrice']);
     }
@@ -413,6 +481,53 @@ class GetTotalSpentYearly {
     // print(temp);
     double finalSpentsum = double.parse(temp);
     return finalSpentsum;
+  }
+}
+
+class GetTotalSpentDaily {
+  Future<double> getTotalSpentDaily() async {
+    String currentDayStr = DateFormat('yyyy-MM-dd').format(pickedDate!);
+    userTransactionsYearly = await funcGetYear.getTransactions();
+    double totalDay = 0;
+
+    for (var i = 0; i < userTransactionsYearly.length; i++) {
+      if (userTransactionsYearly[i]['itemDate'] == currentDayStr) {
+        totalDay =
+            totalDay + double.parse(userTransactionsYearly[i]['itemPrice']);
+      }
+    }
+    // print(CPDsum);
+    String temp = totalDay.toStringAsFixed(2);
+    // print(temp);
+    totalDay = double.parse(temp);
+    return totalDay;
+  }
+}
+
+class GetTransactionsDaily {
+  Future<List<dynamic>> getTransactions() async {
+    String currentDayStr = DateFormat('yyyy-MM-dd').format(pickedDate!);
+    //print(userTransactions);
+    final transactionsRef = db
+        .collection('userData')
+        .doc(userID)
+        .collection('transactions')
+        .doc(
+            'All'); //Change here between 'All' and (year) for present year. // TODO: Add year picker
+
+    DocumentSnapshot snapshot = await transactionsRef.get();
+    final data = snapshot.data() as Map<String, dynamic>;
+    // print(data['transactions']);
+    List transactionList = (data['transactions']);
+    listLength = transactionList.length;
+    userTransactionsDaily = transactionList;
+    userTransactionsDaily
+      ..sort((a, b) => a['itemDate'].compareTo(b['itemDate']));
+    userTransactionsDaily
+        .removeWhere((item) => item['itemDate'] != currentDayStr);
+    //print(userTransactionsDaily.toString());
+    return userTransactionsDaily;
+    // callBack(listLength);
   }
 }
 

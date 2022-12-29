@@ -5,6 +5,7 @@ import 'package:costlynew/pages/newExpenses.dart';
 import 'package:costlynew/pages/deviceLayout.dart';
 import 'package:costlynew/widgets/expensesTable.dart';
 import 'package:costlynew/widgets/expensesTableMobile.dart';
+import 'package:costlynew/widgets/expensesTableYearlyMobile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,17 +15,18 @@ import 'dart:convert';
 import 'package:costlynew/data/data.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
-var funcGet = new GetTransactions();
 var funcGetYear = new GetTransactionsYearly();
 
-class TransactionsAreaMobile extends StatefulWidget {
-  const TransactionsAreaMobile({Key? key}) : super(key: key);
+class TransactionsAreaYearlyMobile extends StatefulWidget {
+  const TransactionsAreaYearlyMobile({Key? key}) : super(key: key);
 
   @override
-  State<TransactionsAreaMobile> createState() => _TransactionsAreaMobileState();
+  State<TransactionsAreaYearlyMobile> createState() =>
+      _TransactionsAreaYearlyMobileState();
 }
 
-class _TransactionsAreaMobileState extends State<TransactionsAreaMobile> {
+class _TransactionsAreaYearlyMobileState
+    extends State<TransactionsAreaYearlyMobile> {
   final user = FirebaseAuth.instance.currentUser!;
   final db = FirebaseFirestore.instance;
   final year = (DateFormat('y').format(DateTime.now())).toString();
@@ -32,7 +34,6 @@ class _TransactionsAreaMobileState extends State<TransactionsAreaMobile> {
   final userID = FirebaseAuth.instance.currentUser?.uid;
   final _transactionName = TextEditingController();
   int listLength = 1;
-  late int daysBetween;
   late Future<String> themeColor;
 
   late String transactionMY;
@@ -49,7 +50,6 @@ class _TransactionsAreaMobileState extends State<TransactionsAreaMobile> {
     return color;
   }
 
-  late Future<List<dynamic>> transactionsDataMonth;
   late Future<List<dynamic>> transactionsDataYear;
 
   // Future<void> _handleRefresh() async {
@@ -63,8 +63,8 @@ class _TransactionsAreaMobileState extends State<TransactionsAreaMobile> {
   }
 
   _loadData() async {
-    await funcGet.getTransactions();
-    transactionsDataMonth = funcGet.getTransactions();
+    await funcGetYear.getTransactions();
+    transactionsDataYear = funcGetYear.getTransactions();
   }
 
   @override
@@ -235,7 +235,7 @@ class _TransactionsAreaMobileState extends State<TransactionsAreaMobile> {
         Positioned(
           top: 70,
           left: 0,
-          child: ExpensesWidgetMobile(),
+          child: ExpensesWidgetMobileAllTime(),
         )
       ]),
     );

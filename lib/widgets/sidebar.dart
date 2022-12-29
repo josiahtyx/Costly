@@ -1,6 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:costlynew/auth/main_page.dart';
+import 'package:costlynew/data/data.dart';
+import 'package:costlynew/pages/dateExpenses.dart';
 import 'package:costlynew/pages/profile.dart';
 import 'package:costlynew/pages/calculatorCPD.dart';
 import 'package:costlynew/pages/deviceLayout.dart';
@@ -15,6 +17,7 @@ final piggybank = Image(image: AssetImage('assets/images/piggybank.png'));
 final userID = FirebaseAuth.instance.currentUser?.uid;
 
 final db = FirebaseFirestore.instance;
+final calendarLogo = Image(image: AssetImage('assets/icons/calendar.png'));
 final calculatorLogo = Image(image: AssetImage('assets/icons/calculator.png'));
 final expensesLogo = Image(image: AssetImage('assets/icons/folder.png'));
 final settingsLogo = Image(image: AssetImage('assets/icons/settings.png'));
@@ -158,6 +161,116 @@ class _SideBarState extends State<SideBar> {
             child: costlyLogo,
           ),
           colorButton(),
+
+          //Expenses
+          Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                    foregroundColor: Color.fromARGB(255, 171, 181, 186),
+                    shape: StadiumBorder(),
+                    padding: const EdgeInsets.all(0),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    elevation: 0),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(600),
+                        child: Container(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: expensesLogo,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text('Expenses'),
+                      SizedBox(
+                        width: 55,
+                      ),
+                    ],
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const TotalExpensesPage()),
+                  );
+                }),
+          ),
+          //Expenses
+          Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                    foregroundColor: Color.fromARGB(255, 171, 181, 186),
+                    shape: StadiumBorder(),
+                    padding: const EdgeInsets.all(0),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    elevation: 0),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(600),
+                        child: Container(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: calendarLogo,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text('Calendar'),
+                      SizedBox(
+                        width: 55,
+                      ),
+                    ],
+                  ),
+                ),
+                onPressed: () async {
+                  pickedDate = await showDatePicker(
+                      builder: (context, child) {
+                        return Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: ColorScheme.light(
+                              primary: Colors.orange, // header background color
+                              onPrimary: Colors.white, // header text color
+                              onSurface: Colors.black, // body text color
+                            ),
+                            textButtonTheme: TextButtonThemeData(
+                              style: TextButton.styleFrom(
+                                primary: Colors.black, // button text color
+                              ),
+                            ),
+                          ),
+                          child: child!,
+                        );
+                      },
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate:
+                          DateTime(2000), //Not to allow to choose before today.
+                      lastDate: DateTime(2200));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DateExpenses()),
+                  );
+                }),
+          ),
           //Calculator Button
           Padding(
             padding: const EdgeInsets.all(2.0),
@@ -201,49 +314,6 @@ class _SideBarState extends State<SideBar> {
                 );
               },
             ),
-          ),
-          //Expenses
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
-                    foregroundColor: Color.fromARGB(255, 171, 181, 186),
-                    shape: StadiumBorder(),
-                    padding: const EdgeInsets.all(0),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    elevation: 0),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(600),
-                        child: Container(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: expensesLogo,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text('Expenses'),
-                      SizedBox(
-                        width: 55,
-                      ),
-                    ],
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const TotalExpensesPage()),
-                  );
-                }),
           ),
           //Settings
           Padding(

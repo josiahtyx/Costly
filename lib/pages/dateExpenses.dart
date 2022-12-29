@@ -3,6 +3,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:costlynew/pages/deviceLayout.dart';
 import 'package:costlynew/widgets/CPDAreaAllTime.dart';
+import 'package:costlynew/widgets/dayExpensesArea.dart';
+import 'package:costlynew/widgets/dayTotal.dart';
 import 'package:costlynew/widgets/expensesAreaAllTimeMobile.dart';
 import 'package:costlynew/widgets/expensesTableYearly.dart';
 import 'package:flutter/material.dart';
@@ -11,14 +13,14 @@ import 'package:costlynew/widgets/expensesAreaAllTime.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:costlynew/pages/newExpenses.dart';
 
-class TotalExpensesPage extends StatefulWidget {
-  const TotalExpensesPage({Key? key}) : super(key: key);
+class DateExpenses extends StatefulWidget {
+  const DateExpenses({Key? key}) : super(key: key);
 
   @override
-  State<TotalExpensesPage> createState() => _TotalExpensesPageState();
+  State<DateExpenses> createState() => _DateExpensesState();
 }
 
-class _TotalExpensesPageState extends State<TotalExpensesPage> {
+class _DateExpensesState extends State<DateExpenses> {
   final user = FirebaseAuth.instance.currentUser!;
   final db = FirebaseFirestore.instance;
 
@@ -37,58 +39,6 @@ class _TotalExpensesPageState extends State<TotalExpensesPage> {
   }
 
   Widget desktopAllTime(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          //Title section
-          backgroundColor: Colors.black,
-          centerTitle: true,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_rounded),
-            tooltip: 'Back',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
-            },
-          ),
-          title: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                  onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomePage()),
-                      ),
-                  child: Text('Costly'))),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.home),
-              tooltip: 'Monthly',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomePage()),
-                );
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   const SnackBar(
-                //     content: Text('There is no new notifications'),
-                //   ),
-                // );
-              },
-            ),
-          ],
-        ),
-        body: Column(children: [
-          CPDAreaYearly(),
-          SizedBox(
-            height: 10,
-          ),
-          TransactionsAreaYearly()
-        ]));
-  }
-
-  Widget mobileAllTime(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           //Title section
@@ -132,11 +82,55 @@ class _TotalExpensesPageState extends State<TotalExpensesPage> {
           ],
         ),
         body: Column(children: [
-          CPDAreaYearly(),
+          DayTotal(),
           SizedBox(
             height: 10,
           ),
-          TransactionsAreaYearlyMobile()
+          DayTransactionsArea()
+        ]));
+  }
+
+  Widget mobileAllTime(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          //Title section
+          backgroundColor: Colors.black,
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_rounded),
+            tooltip: 'Back',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+            },
+          ),
+          title: Text('Costly'),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.home),
+              tooltip: 'Monthly',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                );
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   const SnackBar(
+                //     content: Text('There is no new notifications'),
+                //   ),
+                // );
+              },
+            ),
+          ],
+        ),
+        body: Column(children: [
+          DayTotal(),
+          SizedBox(
+            height: 10,
+          ),
+          DayTransactionsArea()
         ]));
   }
 }

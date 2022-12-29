@@ -3,8 +3,9 @@
 import 'package:costlynew/pages/calculatorCPD.dart';
 import 'package:costlynew/pages/newExpenses.dart';
 import 'package:costlynew/pages/deviceLayout.dart';
+import 'package:costlynew/widgets/dayExpensesTable.dart';
 import 'package:costlynew/widgets/expensesTable.dart';
-import 'package:costlynew/widgets/expensesTableMobile.dart';
+import 'package:costlynew/widgets/expensesTableYearly.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,17 +15,16 @@ import 'dart:convert';
 import 'package:costlynew/data/data.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
-var funcGet = new GetTransactions();
 var funcGetYear = new GetTransactionsYearly();
 
-class TransactionsAreaMobile extends StatefulWidget {
-  const TransactionsAreaMobile({Key? key}) : super(key: key);
+class DayTransactionsArea extends StatefulWidget {
+  const DayTransactionsArea({Key? key}) : super(key: key);
 
   @override
-  State<TransactionsAreaMobile> createState() => _TransactionsAreaMobileState();
+  State<DayTransactionsArea> createState() => _DayTransactionsAreaState();
 }
 
-class _TransactionsAreaMobileState extends State<TransactionsAreaMobile> {
+class _DayTransactionsAreaState extends State<DayTransactionsArea> {
   final user = FirebaseAuth.instance.currentUser!;
   final db = FirebaseFirestore.instance;
   final year = (DateFormat('y').format(DateTime.now())).toString();
@@ -49,8 +49,144 @@ class _TransactionsAreaMobileState extends State<TransactionsAreaMobile> {
     return color;
   }
 
-  late Future<List<dynamic>> transactionsDataMonth;
-  late Future<List<dynamic>> transactionsDataYear;
+  int daysBetweenFixed(startDate, endDate) {
+    DateTime sDate = DateTime.parse(startDate.toString());
+    DateTime eDate = DateTime.parse(endDate.toString());
+    int result = ((endDate.difference(startDate).inDays) + 1);
+    return result;
+  }
+
+  Widget categoryButton(String index) {
+    if (index == 'Food') {
+      return Container(
+        width: 130,
+        decoration: BoxDecoration(
+            color: Color.fromARGB(255, 124, 214, 154),
+            borderRadius: BorderRadius.all(Radius.circular(20))),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+          child: Text(
+            textAlign: TextAlign.center,
+            "Food",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      );
+    }
+    if (index == 'Subscriptions') {
+      return Container(
+        width: 130,
+        decoration: BoxDecoration(
+            color: Color.fromARGB(255, 255, 68, 68),
+            borderRadius: BorderRadius.all(Radius.circular(20))),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+          child: Text(
+            textAlign: TextAlign.center,
+            "Subscriptions",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      );
+    }
+    if (index == 'Travel') {
+      return Container(
+        width: 130,
+        decoration: BoxDecoration(
+            color: Color.fromARGB(255, 68, 165, 255),
+            borderRadius: BorderRadius.all(Radius.circular(20))),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+          child: Text(
+            textAlign: TextAlign.center,
+            "Travel",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      );
+    }
+    if (index == 'Tech') {
+      return Container(
+        width: 130,
+        decoration: BoxDecoration(
+            color: Color.fromARGB(255, 0, 88, 160),
+            borderRadius: BorderRadius.all(Radius.circular(20))),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+          child: Text(
+            textAlign: TextAlign.center,
+            "Tech",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      );
+    }
+    if (index == 'Utilities') {
+      return Container(
+        width: 130,
+        decoration: BoxDecoration(
+            color: Color.fromARGB(255, 255, 203, 68),
+            borderRadius: BorderRadius.all(Radius.circular(20))),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+          child: Text(
+            textAlign: TextAlign.center,
+            "Utilities",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Container(
+        width: 130,
+        decoration: BoxDecoration(
+            color: Colors.grey[400],
+            borderRadius: BorderRadius.all(Radius.circular(20))),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+          child: Text(
+            textAlign: TextAlign.center,
+            'No Category',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  double calculateCPD(date, price) {
+    DateTime receivedDate = DateTime.parse(date);
+    int dateDifference = ((DateTime.now().difference(receivedDate).inDays) + 1);
+    // print(dateDifference);
+    daysBetween =
+        dateDifference; //so first we get the difference from the transaction date and today.
+
+    double receivedPrice =
+        double.parse(price); //then we take the price and turn it into a double
+    String cpdAmount = (receivedPrice / daysBetween).toStringAsFixed(2);
+    double newcpdAmount = double.parse(cpdAmount);
+    return newcpdAmount;
+  }
+
+  late Future<List<dynamic>> transactionsDataDaily;
 
   // Future<void> _handleRefresh() async {
   //   await userTransactions;
@@ -62,22 +198,17 @@ class _TransactionsAreaMobileState extends State<TransactionsAreaMobile> {
     themeColor = getProfileColor();
   }
 
-  _loadData() async {
-    await funcGet.getTransactions();
-    transactionsDataMonth = funcGet.getTransactions();
-  }
-
   @override
   Widget build(BuildContext context) {
     final device = MediaQuery.of(context).size;
     return Container(
-      width: device.width * 0.99,
-      height: device.height * 0.725,
+      width: device.width * 0.95,
+      height: device.height * 0.7,
       child: Stack(children: [
         //Header of Expenses Table Widget
         Positioned(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+            padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -174,43 +305,48 @@ class _TransactionsAreaMobileState extends State<TransactionsAreaMobile> {
                             }
                           },
                         ),
-
                         Spacer(),
-                        // ElevatedButton(
-                        //   onPressed: () {
-                        //     Navigator.push(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //           builder: (context) => const HomePage()),
-                        //     );
-                        //   },
-                        //   child: Text(
-                        //     'Reload',
-                        //     style: TextStyle(
-                        //       color: Colors.white,
-                        //       fontSize: 15,
-                        //       fontWeight: FontWeight.w500,
-                        //     ),
-                        //   ),
-                        //   style: ElevatedButton.styleFrom(
-                        //       primary: Colors.orange[800],
-                        //       shape: RoundedRectangleBorder(
-                        //         borderRadius: BorderRadius.circular(15),
-                        //       ) // Background color
-                        //       ),
-                        // ),
-
                         SizedBox(
                           width: 10,
                         ),
-
+                        Container(
+                          width: 100,
+                          child: Text(
+                            textAlign: TextAlign.center,
+                            'Category',
+                            style: GoogleFonts.nunito(
+                              textStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(left: 95.0),
+                          child: Container(
+                            width: 120,
+                            child: Text(
+                              textAlign: TextAlign.center,
+                              'CPD',
+                              style: GoogleFonts.nunito(
+                                textStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 55.0),
                           child: Container(
                             width: 100,
                             child: Text(
                               textAlign: TextAlign.center,
-                              'CPD',
+                              'Amount',
                               style: GoogleFonts.nunito(
                                 textStyle: TextStyle(
                                   color: Colors.black,
@@ -233,9 +369,9 @@ class _TransactionsAreaMobileState extends State<TransactionsAreaMobile> {
           ),
         ),
         Positioned(
-          top: 70,
-          left: 0,
-          child: ExpensesWidgetMobile(),
+          top: 90,
+          left: 15,
+          child: DayExpensesWidget(),
         )
       ]),
     );

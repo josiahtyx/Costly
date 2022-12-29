@@ -3,7 +3,7 @@
 import 'package:costlynew/pages/calculatorCPD.dart';
 import 'package:costlynew/pages/newExpenses.dart';
 import 'package:costlynew/pages/deviceLayout.dart';
-import 'package:costlynew/widgets/expensesWidget.dart';
+import 'package:costlynew/widgets/expensesTable.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -48,234 +48,11 @@ class _TransactionsAreaState extends State<TransactionsArea> {
     return color;
   }
 
-  @override
-  Future<void> showDetails(
-    BuildContext context,
-    String category,
-    String costPerDay,
-    String duration,
-    String endDate,
-    String purchaseDate,
-    String itemName,
-    String price,
-  ) async {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          final device = MediaQuery.of(context).size;
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(32.0))),
-            content: SizedBox(
-                height: device.height * 0.8,
-                width: device.width * 0.3,
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: Container(
-                          child: Text(
-                              style: GoogleFonts.nunito(
-                                textStyle: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: device.width * 0.03,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              "Purchase Details"),
-                        ),
-                      ),
-                      SizedBox(height: device.height * 0.03),
-                      Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "Purchase Name:"),
-                                Spacer(),
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    itemName),
-                              ],
-                            ),
-                            SizedBox(
-                              height: device.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "Category:"),
-                                Spacer(),
-                                categoryButton(category),
-                              ],
-                            ),
-                            SizedBox(
-                              height: device.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "Price:"),
-                                Spacer(),
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    price + '€'),
-                              ],
-                            ),
-                            SizedBox(
-                              height: device.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "Purchased Date:"),
-                                Spacer(),
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    purchaseDate),
-                              ],
-                            ),
-                            SizedBox(
-                              height: device.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "End Date:"),
-                                Spacer(),
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    endDate),
-                              ],
-                            ),
-                            SizedBox(
-                              height: device.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "Duration:"),
-                                Spacer(),
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    duration + " days"),
-                              ],
-                            ),
-                            SizedBox(
-                              height: device.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "CPD Amount:"),
-                                Spacer(),
-                                Text(
-                                  style: GoogleFonts.nunito(
-                                    textStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: device.height * 0.03,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  ((calculateCPD((purchaseDate), (price)))
-                                          .toString()
-                                          .replaceAll(RegExp(r'\.'), ',') +
-                                      "€" +
-                                      "/" +
-                                      daysBetween.toString() +
-                                      "d"),
-                                ),
-                              ],
-                            )
-                          ]),
-                    ],
-                  ),
-                )),
-          );
-        });
+  int daysBetweenFixed(startDate, endDate) {
+    DateTime sDate = DateTime.parse(startDate.toString());
+    DateTime eDate = DateTime.parse(endDate.toString());
+    int result = ((endDate.difference(startDate).inDays) + 1);
+    return result;
   }
 
   Widget categoryButton(String index) {
@@ -433,6 +210,7 @@ class _TransactionsAreaState extends State<TransactionsArea> {
       width: double.maxFinite,
       height: double.maxFinite,
       child: Stack(children: [
+        //Header of Expenses Table Widget
         Positioned(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),

@@ -7,14 +7,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 var funcCPD = GetCPDTotal();
 var funcSpent = GetTotalSpent();
 
-class CPDArea extends StatefulWidget {
-  const CPDArea({Key? key}) : super(key: key);
+class CPDAreaMobile extends StatefulWidget {
+  const CPDAreaMobile({Key? key}) : super(key: key);
 
   @override
-  State<CPDArea> createState() => _CPDAreaState();
+  State<CPDAreaMobile> createState() => _CPDAreaMobileState();
 }
 
-class _CPDAreaState extends State<CPDArea> {
+class _CPDAreaMobileState extends State<CPDAreaMobile> {
   late Future<double> totalCPD;
   late Future<double> totalSpent;
   DateTime dateNow = DateTime.now();
