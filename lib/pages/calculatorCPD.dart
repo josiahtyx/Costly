@@ -25,8 +25,8 @@ class _CPDCalculatorState extends State<CPDCalculator> {
   @override
   void initState() {
     super.initState();
-    _daysController.text = (0).toString();
-    _daysController.value = TextEditingValue(text: (0).toString());
+    _priceController.text = "0";
+    _daysController.text = "0";
   }
 
   @override
@@ -37,27 +37,49 @@ class _CPDCalculatorState extends State<CPDCalculator> {
   }
 
   void subtractYear() {
-    //print(_daysController.text.toString());
-    int value = int.parse(_daysController.text.toString());
-    //print(value);
-    value = value - 365;
-    // print(value);
-    _daysController.text = value.toString();
-    _daysController.value = TextEditingValue(text: value.toString());
-    calculateCPD();
-    setState(() {});
+    if (_daysController.text == "") {
+      _daysController.value = TextEditingValue(text: (0).toString());
+      int value = int.parse(_daysController.text.toString());
+      //print(value);
+      value = value - 365;
+      // print(value);
+      _daysController.text = value.toString();
+      _daysController.value = TextEditingValue(text: value.toString());
+      calculateCPD();
+      setState(() {});
+    } else {
+      int value = int.parse(_daysController.text.toString());
+      //print(value);
+      value = value - 365;
+      // print(value);
+      _daysController.text = value.toString();
+      _daysController.value = TextEditingValue(text: value.toString());
+      calculateCPD();
+      setState(() {});
+    }
   }
 
   void addYear() {
-    //print(_daysController.text.toString());
-    int value = int.parse(_daysController.text.toString());
-    // print(value);
-    value = value + 365;
-    // print(value);
-    _daysController.text = value.toString();
-    _daysController.value = TextEditingValue(text: value.toString());
-    calculateCPD();
-    setState(() {});
+    if (_daysController.text == "") {
+      _daysController.value = TextEditingValue(text: (0).toString());
+      int value = int.parse(_daysController.text.toString());
+      //print(value);
+      value = value + 365;
+      // print(value);
+      _daysController.text = value.toString();
+      _daysController.value = TextEditingValue(text: value.toString());
+      calculateCPD();
+      setState(() {});
+    } else {
+      int value = int.parse(_daysController.text.toString());
+      //print(value);
+      value = value + 365;
+      // print(value);
+      _daysController.text = value.toString();
+      _daysController.value = TextEditingValue(text: value.toString());
+      calculateCPD();
+      setState(() {});
+    }
   }
 
   void calculateCPD() {
@@ -65,7 +87,7 @@ class _CPDCalculatorState extends State<CPDCalculator> {
     int days = int.parse(_daysController.text);
     String CPD = (price / days).toStringAsFixed(2);
     finalCPD = CPD;
-    print(finalCPD);
+    //print(finalCPD);
   }
 
   Future<void> _displayTextInputDialog(BuildContext context) async {
@@ -92,19 +114,22 @@ class _CPDCalculatorState extends State<CPDCalculator> {
                     ) // Background color
                     ),
                 child: Text('OK'),
-                onPressed: () {
+                onPressed: () async {
                   setState(() {
                     addPlans(
                         nameText.toString(),
                         _priceController.text.toString(),
-                        _daysController.text.toString());
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const PlannedPurchases()),
-                    );
-                    // changeProfilePic(url);
+                        _daysController.text.toString(),
+                        0);
                   });
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('New plan added!')));
+                  await Future.delayed(Duration(seconds: 1));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PlannedPurchases()),
+                  );
                 },
               ),
             ],
@@ -114,10 +139,19 @@ class _CPDCalculatorState extends State<CPDCalculator> {
 
   Widget addPlansButton(BuildContext context) {
     return ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            primary: Colors.orange[800],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ) // Background color
+            ),
         onPressed: (() {
           _displayTextInputDialog(context);
         }),
-        child: Text("Add to Plans"));
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
+          child: Text("Add to Plans"),
+        ));
   }
 
   Widget mobileCalculator(BuildContext context) {
@@ -367,7 +401,7 @@ class _CPDCalculatorState extends State<CPDCalculator> {
                         ),
                         borderRadius: BorderRadius.circular(20)),
                     alignment: Alignment.center,
-                    height: device.height * 0.8,
+                    height: device.height * 0.85,
                     width: device.width * 0.5,
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(25, 40, 25, 25),
@@ -409,6 +443,9 @@ class _CPDCalculatorState extends State<CPDCalculator> {
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: TextFormField(
+                                        onTap: () {
+                                          _priceController.clear();
+                                        },
                                         onChanged: (value) {
                                           calculateCPD();
                                           setState(() {});
@@ -509,8 +546,14 @@ class _CPDCalculatorState extends State<CPDCalculator> {
                                                   fontSize: 24),
                                               decoration: InputDecoration(
                                                 border: InputBorder.none,
-                                                hintText:
-                                                    '0', /*prefixText: '€'*/
+                                                hintText: '0',
+                                                /*prefixText: '€'*/
+                                                hintStyle:
+                                                    GoogleFonts.montserrat(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 24),
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
@@ -574,24 +617,33 @@ class _CPDCalculatorState extends State<CPDCalculator> {
                                   )
                                 ]),
                               ),
-                              //addPlansButton(context),
-                              // ElevatedButton(
-                              //   onPressed: () {
-                              //     calculateCPD();
-                              //     setState(() {});
-                              //     //add Controllers here
-                              //   },
-                              //   style: ElevatedButton.styleFrom(
-                              //       primary: Colors.orange[800],
-                              //       shape: RoundedRectangleBorder(
-                              //         borderRadius: BorderRadius.circular(30),
-                              //       ) // Background color
-                              //       ),
-                              //   child: Padding(
-                              //     padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                              //     child: Text('Calculate'),
-                              //   ),
-                              // )
+                              if (_priceController.text != "0" &&
+                                  _daysController.text != "0")
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 12.0),
+                                  child: addPlansButton(context),
+                                ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 12.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    calculateCPD();
+                                    setState(() {});
+                                    //add Controllers here
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      primary: Colors.orange[800],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ) // Background color
+                                      ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        30, 10, 30, 10),
+                                    child: Text('Calculate'),
+                                  ),
+                                ),
+                              )
                             ]),
                       ),
                     ),

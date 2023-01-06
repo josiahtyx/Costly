@@ -4,8 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+int appThemeColor = (int.parse("0xffef6c00"));
 final user = FirebaseAuth.instance.currentUser!;
 final db = FirebaseFirestore.instance;
+final monthYearPath = db
+    .collection('userData')
+    .doc(userID)
+    .collection('transactions')
+    .doc(monthYear);
 final year = (DateFormat('y').format(DateTime.now())).toString();
 final month = (DateFormat('MMMM').format(DateTime.now())).toString();
 final monthYear = (DateFormat('MMMM y').format(DateTime.now())).toString();
@@ -23,7 +29,8 @@ int getDaysBetweenNow(date) {
   return duration;
 }
 
-Future addPlans(String itemName, String price, String duration) async {
+Future addPlans(
+    String itemName, String price, String duration, int savedAmount) async {
   await db
       .collection('userData')
       .doc(userID)
@@ -36,6 +43,7 @@ Future addPlans(String itemName, String price, String duration) async {
           'itemName': itemName,
           'itemPrice': price,
           'duration': duration,
+          'savedAmount': savedAmount,
         },
       ],
     ),
@@ -141,6 +149,24 @@ class GetPlans {
     // callBack(listLength);
     // print(listLength);
   }
+}
+
+Future newTransactionFolder() async {
+  monthYearPath.get().then(((value) => {
+        if (value.exists)
+          {
+            //do nothing
+          }
+        else
+          {
+            print("Transaction Folder Made!"),
+            monthYearPath.set({
+              'transactions': FieldValue.arrayUnion(
+                [],
+              ),
+            }, SetOptions(merge: true)),
+          }
+      }));
 }
 
 class GetTransactions {
@@ -312,6 +338,41 @@ Future archiveTransaction(
       ],
     ),
   }, SetOptions(merge: true));
+}
+
+Future delPlans(
+  String duration,
+  String itemName,
+  String price,
+  int savedAmount,
+  //String daysBetween,
+) async {
+  await db
+      .collection('userData')
+      .doc(userID)
+      .collection('plans')
+      .doc("plannedPurchases")
+      .set({
+    'plannedPurchases': FieldValue.arrayRemove(
+      [
+        {
+          'duration': duration,
+          'itemName': itemName,
+          'itemPrice': price,
+          'savedAmount': savedAmount,
+        },
+      ],
+    ),
+  }, SetOptions(merge: true));
+}
+
+Future<String> getProfileColor() async {
+  DocumentSnapshot snapshot = await db.collection('userData').doc(userID).get();
+  String color = snapshot.get('themeColor');
+  appThemeColor = int.parse(color);
+  //print('URL is ' + newURL);
+  // url = newURL;
+  return color;
 }
 
 Future delTransaction(
@@ -543,9 +604,9 @@ class GetTransactionsDaily {
 // void printList() {
 //   print(userTransactions[0]);
 // }
-Future delAllData(String userID) async {
-  await db.collection('userData').doc(userID).delete();
-  user.delete();
+Future delAllData(String uid) async {
+  await db.collection('userData').doc(uid).delete();
+  await user.delete();
 }
 
 Future delColor(String userID) async {

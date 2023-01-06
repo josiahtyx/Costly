@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:costlynew/pages/profile.dart';
-import 'package:costlynew/widgets/CPDAreaMonthlyDesktop.dart';
+import 'package:costlynew/widgets/desktop/CPDAreaMonthlyDesktop.dart';
 import 'package:costlynew/widgets/tips.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,7 +20,7 @@ class _HeroAreaState extends State<HeroArea> {
   final double profileHeight = 144;
   late Future<String> profileURL;
   late Future<String> themeColor;
-  final piggybank = Image(image: AssetImage('assets/images/waves.png'));
+  final waves = Image(image: AssetImage('assets/images/waves.png'));
 
   Future<String> getProfilePicUrl() async {
     DocumentSnapshot snapshot =

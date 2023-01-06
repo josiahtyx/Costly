@@ -29,17 +29,15 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
   final monthYear = DateFormat('MMMM y').format(DateTime.now());
   final year = DateFormat('y').format(DateTime.now());
   final userID = FirebaseAuth.instance.currentUser?.uid;
+
   String dropdownCategory = "No Category";
 
   var categories = [
     'No Category',
-    'Entertainment',
     'Food',
-    'Personal',
-    'Shopping',
     'Subscriptions',
-    'Tech',
     'Travel',
+    'Tech',
     'Utilities',
   ];
 
@@ -90,7 +88,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
             'itemDate': purchaseDate,
             'endDate': endDate,
             'duration': duration,
-            //'costPerDay': costPerDay,
+            'costPerDay': costPerDay,
             'category': itemCategory,
           },
         ],
@@ -131,7 +129,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
             //'daysBetween': daysBetween, //this is kinda useless since calculation is done later
             'endDate': endDate,
             'duration': duration,
-            //'costPerDay': costPerDay,
+            'costPerDay': costPerDay,
             'category': itemCategory,
           },
         ],
@@ -256,15 +254,12 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 20.0),
                           child: TextField(
-                              controller: _itemNameController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: 'Item Name',
-                              ),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp("[a-zA-Z0-9_ ]")),
-                              ]),
+                            controller: _itemNameController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Item Name',
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -373,33 +368,32 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                                 true, //set it true, so that user will not able to edit text
                             onTap: () async {
                               DateTime? pickedDate = await showDatePicker(
-                                builder: (context, child) {
-                                  return Theme(
-                                    data: Theme.of(context).copyWith(
-                                      colorScheme: ColorScheme.light(
-                                        primary: Colors
-                                            .orange, // header background color
-                                        onPrimary:
-                                            Colors.white, // header text color
-                                        onSurface:
-                                            Colors.black, // body text color
-                                      ),
-                                      textButtonTheme: TextButtonThemeData(
-                                        style: TextButton.styleFrom(
-                                          primary:
-                                              Colors.black, // button text color
+                                  builder: (context, child) {
+                                    return Theme(
+                                      data: Theme.of(context).copyWith(
+                                        colorScheme: ColorScheme.light(
+                                          primary: Colors
+                                              .orange, // header background color
+                                          onPrimary:
+                                              Colors.white, // header text color
+                                          onSurface:
+                                              Colors.black, // body text color
+                                        ),
+                                        textButtonTheme: TextButtonThemeData(
+                                          style: TextButton.styleFrom(
+                                            primary: Colors
+                                                .black, // button text color
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    child: child!,
-                                  );
-                                },
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(
-                                    2000), //DateTime.now() - not to allow to choose before today.
-                                lastDate: DateTime(2100),
-                              );
+                                      child: child!,
+                                    );
+                                  },
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(
+                                      2000), //DateTime.now() - not to allow to choose before today.
+                                  lastDate: DateTime.now());
 
                               if (pickedDate != null) {
                                 // print(pickedDate);
@@ -508,8 +502,8 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                                   },
                                   context: context,
                                   initialDate: DateTime.now(),
-                                  firstDate: DateTime.parse(pickedStartDate
-                                      .toString()), //Not to allow to choose before start date.
+                                  firstDate: DateTime(
+                                      2000), //DateTime.now() - not to allow to choose before today.
                                   lastDate: DateTime(2200));
 
                               if (pickedEndDate != null) {
@@ -524,7 +518,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                                 String formattedDate = DateFormat('yyyy-MM-dd')
                                     .format(pickedEndDate);
                                 int duration = int.parse(difference) + 1;
-                                //print(duration);
+                                print(duration);
                                 // print(
                                 //     formattedDate); //formatted date output using intl package =>  2021-03-16
                                 //you can implement different kind of Date Format here according to your requirement

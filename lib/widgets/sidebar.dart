@@ -3,6 +3,7 @@
 import 'package:costlynew/auth/main_page.dart';
 import 'package:costlynew/data/data.dart';
 import 'package:costlynew/pages/dateExpenses.dart';
+import 'package:costlynew/pages/plannedPurchases.dart';
 import 'package:costlynew/pages/profile.dart';
 import 'package:costlynew/pages/calculatorCPD.dart';
 import 'package:costlynew/pages/deviceLayout.dart';
@@ -14,6 +15,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 final costlyLogo = Image(image: AssetImage('assets/icons/costlylogo.png'));
 final piggybank = Image(image: AssetImage('assets/images/piggybank.png'));
+final costlyLogoBlack =
+    Image(image: AssetImage('assets/icons/costlylogoblack.png'));
+final piggybankGrey =
+    Image(image: AssetImage('assets/images/piggybankgrey.png'));
 final userID = FirebaseAuth.instance.currentUser?.uid;
 
 final db = FirebaseFirestore.instance;
@@ -38,14 +43,31 @@ class _SideBarState extends State<SideBar> {
     themeColor = getProfileColor();
   }
 
-  Future<String> getProfileColor() async {
-    DocumentSnapshot snapshot =
-        await db.collection('userData').doc(userID).get();
-    String color = snapshot.get('themeColor');
-    //print('URL is ' + newURL);
-    // url = newURL;
-    return color;
-  }
+  Widget showLogo() => FutureBuilder(
+      future: themeColor,
+      builder: ((context, snapshot) {
+        if (snapshot.hasData) {
+          print(snapshot.data.toString());
+          return ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                  Color(int.parse(snapshot.data.toString())),
+                  BlendMode.srcATop),
+              child: costlyLogoBlack);
+        } else {
+          return costlyLogo;
+        }
+      }));
+
+  Widget showPig() => FutureBuilder(
+      future: themeColor,
+      builder: ((context, snapshot) {
+        if (snapshot.hasData) {
+          print(snapshot.data.toString());
+          return piggybankGrey;
+        } else {
+          return piggybank;
+        }
+      }));
 
   Widget colorButton() => FutureBuilder(
         future: themeColor,
@@ -158,7 +180,7 @@ class _SideBarState extends State<SideBar> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(25, 65, 45, 65),
-            child: costlyLogo,
+            child: showLogo(),
           ),
           colorButton(),
 
@@ -264,11 +286,18 @@ class _SideBarState extends State<SideBar> {
                       firstDate:
                           DateTime(2000), //Not to allow to choose before today.
                       lastDate: DateTime(2200));
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const DateExpenses()),
-                  );
+                  if (pickedDate != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const DateExpenses()),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    );
+                  }
                 }),
           ),
           //Calculator Button
@@ -299,7 +328,7 @@ class _SideBarState extends State<SideBar> {
                     SizedBox(
                       width: 10,
                     ),
-                    Text('Calculators'),
+                    Text('Plans'),
                     SizedBox(
                       width: 45,
                     ),
@@ -310,7 +339,7 @@ class _SideBarState extends State<SideBar> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const CPDCalculator()),
+                      builder: (context) => const PlannedPurchases()),
                 );
               },
             ),
@@ -407,7 +436,7 @@ class _SideBarState extends State<SideBar> {
           Container(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 20.0, 30),
-              child: piggybank,
+              child: showPig(),
             ),
           ),
         ]),

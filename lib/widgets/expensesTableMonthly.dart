@@ -1,26 +1,24 @@
 import 'package:costlynew/data/data.dart';
 import 'package:costlynew/data/tempFields.dart';
-import 'package:costlynew/pages/allTimeExpenses.dart';
-import 'package:costlynew/pages/editExpenses.dart';
 import 'package:flutter/material.dart';
 import 'package:costlynew/pages/deviceLayout.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:costlynew/data/data.dart';
+import 'package:costlynew/pages/editExpenses.dart';
 
-var funcGetYear = new GetTransactionsYearly();
+var funcGet = new GetTransactions();
 
-class ExpensesWidgetYearly extends StatefulWidget {
-  const ExpensesWidgetYearly({super.key});
+class ExpensesWidget extends StatefulWidget {
+  const ExpensesWidget({super.key});
 
   @override
-  State<ExpensesWidgetYearly> createState() => _ExpensesWidgetYearlyState();
+  State<ExpensesWidget> createState() => _ExpensesWidgetState();
 }
 
-class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
-  late Future<List<dynamic>> transactionsDataYear;
+class _ExpensesWidgetState extends State<ExpensesWidget> {
+  late Future<List<dynamic>> transactionsDataMonth;
   final user = FirebaseAuth.instance.currentUser!;
   final db = FirebaseFirestore.instance;
   final year = (DateFormat('y').format(DateTime.now())).toString();
@@ -30,11 +28,14 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
   int listLength = 1;
   late Future<String> themeColor;
   late bool _isLoading;
+  // Future<void> _handleRefresh() async {
+  //   await userTransactions;
+  // }
 
   void wait() async {
     _isLoading = true;
-    funcGetYear.getTransactions();
-    transactionsDataYear = funcGetYear.getTransactions();
+    await funcGet.getTransactions();
+    transactionsDataMonth = funcGet.getTransactions();
     Future.delayed(const Duration(seconds: 1), () {
       setState(() {
         _isLoading = false;
@@ -46,11 +47,17 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
   void initState() {
     super.initState();
     wait();
+
+    //This part needs to be updated to be manual or something
+
+    // getCPDtotal();
+    // totalCPD = getCPDtotal();
   }
 
   _loadData() async {
-    await funcGetYear.getTransactions();
-    transactionsDataYear = funcGetYear.getTransactions();
+    await funcGet.getTransactions();
+    transactionsDataMonth = funcGet.getTransactions();
+    //print(transactionsDataMonth.toString());
   }
 
   Widget categoryButton(String index) {
@@ -516,34 +523,6 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                               ],
                             )
                           ]),
-                      Spacer(),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              primary: Colors.orange[800],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ) // Background color
-                              ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const EditExpensesPage()),
-                            );
-                          },
-                          child: Text(
-                            'Add',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 )),
@@ -557,6 +536,8 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
     return Padding(
       padding: const EdgeInsets.only(top: 68.0),
       child: Container(
+        width: double.maxFinite,
+        height: double.maxFinite,
         child: _isLoading
             ? ListView.separated(
                 itemBuilder: ((context, index) => const AsyncBarRow()),
@@ -570,27 +551,25 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                       child: FutureBuilder(
-                          future: transactionsDataYear,
+                          future: transactionsDataMonth,
                           builder: (context, snapshot) {
                             return ListView.builder(
                               physics: BouncingScrollPhysics(),
                               scrollDirection: Axis.vertical,
                               shrinkWrap: true,
-                              itemCount: userTransactionsYearly.length,
+                              itemCount: userTransactions.length,
                               itemBuilder: ((context, index) {
-                                final item =
-                                    userTransactionsYearly[index].toString();
+                                final item = userTransactions[index].toString();
 
                                 return GestureDetector(
                                   onLongPress: () {
                                     modifyTextFields(
-                                      userTransactionsYearly[index]['itemName'],
-                                      userTransactionsYearly[index]
-                                          ['itemPrice'],
-                                      userTransactionsYearly[index]['itemDate'],
-                                      userTransactionsYearly[index]['endDate'],
-                                      userTransactionsYearly[index]['category'],
-                                      userTransactionsYearly[index]['duration'],
+                                      userTransactions[index]['itemName'],
+                                      userTransactions[index]['itemPrice'],
+                                      userTransactions[index]['itemDate'],
+                                      userTransactions[index]['endDate'],
+                                      userTransactions[index]['category'],
+                                      userTransactions[index]['duration'],
                                     );
                                     Navigator.push(
                                       context,
@@ -602,25 +581,19 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                                   onTap: () {
                                     showDetails(
                                       context,
-                                      (userTransactionsYearly[index]
-                                              ['category'])
+                                      (userTransactions[index]['category'])
                                           .toString(),
-                                      (userTransactionsYearly[index]
-                                              ['costPerDay'])
+                                      (userTransactions[index]['costPerDay'])
                                           .toString(),
-                                      (userTransactionsYearly[index]
-                                              ['duration'])
+                                      (userTransactions[index]['duration'])
                                           .toString(),
-                                      (userTransactionsYearly[index]['endDate'])
+                                      (userTransactions[index]['endDate'])
                                           .toString(),
-                                      (userTransactionsYearly[index]
-                                              ['itemDate'])
+                                      (userTransactions[index]['itemDate'])
                                           .toString(),
-                                      (userTransactionsYearly[index]
-                                              ['itemName'])
+                                      (userTransactions[index]['itemName'])
                                           .toString(),
-                                      (userTransactionsYearly[index]
-                                              ['itemPrice'])
+                                      (userTransactions[index]['itemPrice'])
                                           .toString(),
                                     );
                                   },
@@ -655,32 +628,25 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(SnackBar(
                                                 content: Text(
-                                                    '${userTransactionsYearly[index]['itemName']} has been archived.')));
+                                                    '${userTransactions[index]['itemName']} has been archived.')));
                                         archiveTransaction(
-                                          (userTransactionsYearly[index]
-                                                  ['category'])
+                                          (userTransactions[index]['category'])
                                               .toString(),
-                                          // (userTransactionsYearly[index]['costPerDay'])
+                                          // (userTransactions[index]['costPerDay'])
                                           //     .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['duration'])
+                                          (userTransactions[index]['duration'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['endDate'])
+                                          (userTransactions[index]['endDate'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['itemDate'])
+                                          (userTransactions[index]['itemDate'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['itemName'])
+                                          (userTransactions[index]['itemName'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['itemPrice'])
+                                          (userTransactions[index]['itemPrice'])
                                               .toString(),
                                         );
                                         setState(() {
-                                          userTransactionsYearly
-                                              .removeAt(index);
+                                          userTransactions.removeAt(index);
                                         });
 
                                         await Future.delayed(
@@ -689,39 +655,32 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const TotalExpensesPage()),
+                                                  const HomePage()),
                                         );
                                       } else {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(SnackBar(
                                                 content: Text(
-                                                    '${userTransactionsYearly[index]['itemName']} has been deleted.')));
+                                                    '${userTransactions[index]['itemName']} has been deleted.')));
                                         delTransaction(
-                                          (userTransactionsYearly[index]
-                                                  ['category'])
+                                          (userTransactions[index]['category'])
                                               .toString(),
-                                          // (userTransactionsYearly[index]['costPerDay'])
+                                          // (userTransactions[index]['costPerDay'])
                                           //     .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['duration'])
+                                          (userTransactions[index]['duration'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['endDate'])
+                                          (userTransactions[index]['endDate'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['itemDate'])
+                                          (userTransactions[index]['itemDate'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['itemName'])
+                                          (userTransactions[index]['itemName'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['itemPrice'])
+                                          (userTransactions[index]['itemPrice'])
                                               .toString(),
                                         );
                                         // Remove the item from the data source.
                                         setState(() {
-                                          userTransactionsYearly
-                                              .removeAt(index);
+                                          userTransactions.removeAt(index);
                                         });
 
                                         await Future.delayed(
@@ -730,7 +689,7 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const TotalExpensesPage()),
+                                                  const HomePage()),
                                         );
                                       }
 
@@ -741,21 +700,26 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                                       child: Align(
                                         alignment: Alignment.center,
                                         child: ListTile(
-                                          title: Text(
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                              (userTransactionsYearly[index]
-                                                      ['itemName'])
-                                                  .toString()),
+                                          title: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 12.0),
+                                            child: Text(
+                                                textAlign: TextAlign.left,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                                (userTransactions[index]
+                                                        ['itemName'])
+                                                    .toString()),
+                                          ),
                                           // subtitle: Text(('Item Price: ' +
-                                          //         userTransactionsYearly[index]['itemPrice']
+                                          //         userTransactions[index]['itemPrice']
                                           //             .replaceAll(RegExp(r'\.'), ',') +
                                           //         '€' +
                                           //         '\nPurchase Date: ' +
-                                          //         userTransactionsYearly[index]['itemDate'] +
+                                          //         userTransactions[index]['itemDate'] +
                                           //         '')
                                           //     .toString()),
                                           trailing: Wrap(
@@ -763,21 +727,20 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                                                 0, // space between two icons
                                             children: <Widget>[
                                               categoryButton(
-                                                  userTransactionsYearly[index]
+                                                  userTransactions[index]
                                                       ['category']),
                                               Padding(
                                                   padding:
                                                       const EdgeInsets.only(
                                                           left: 80.0),
                                                   child: SizedBox(
-                                                    width: 120,
+                                                    width: 100,
                                                     child: CPDday(
-                                                        userTransactionsYearly[
-                                                            index]['duration'],
-                                                        userTransactionsYearly[
-                                                            index]['itemDate'],
-                                                        userTransactionsYearly[
-                                                                index]
+                                                        userTransactions[index]
+                                                            ['duration'],
+                                                        userTransactions[index]
+                                                            ['itemDate'],
+                                                        userTransactions[index]
                                                             ['itemPrice']),
                                                   )),
                                               Padding(
@@ -794,8 +757,7 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                                                         fontWeight:
                                                             FontWeight.w700,
                                                       ),
-                                                      ((userTransactionsYearly[
-                                                                      index][
+                                                      ((userTransactions[index][
                                                                   'itemPrice']))
                                                               .toString()
                                                               .replaceAll(
@@ -853,7 +815,7 @@ class AsyncBarRow extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(38, 0, 5, 0),
               child: AsyncBar(
-                width: 120,
+                width: 110,
               ),
             ),
             Padding(

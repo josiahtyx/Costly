@@ -118,15 +118,6 @@ class _AccountPageState extends State<AccountPage> {
     return newURL;
   }
 
-  Future<String> getProfileColor() async {
-    DocumentSnapshot snapshot =
-        await db.collection('userData').doc(userID).get();
-    String color = snapshot.get('themeColor');
-    //print('URL is ' + newURL);
-    // url = newURL;
-    return color;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -138,12 +129,6 @@ class _AccountPageState extends State<AccountPage> {
   void dispose() {
     _profilePicController.dispose();
     super.dispose();
-  }
-
-  Future<void> delUser() async {
-    user;
-    db.collection("userData").doc(userID).delete();
-    user.delete();
   }
 
   Future changeUserName(String newUserName) async {
@@ -190,22 +175,23 @@ class _AccountPageState extends State<AccountPage> {
                   onPrimary: Colors.white, // foreground
                 ),
                 child: Text('Reset'),
-                onPressed: () {
+                onPressed: () async {
                   setState(() {
                     delColor(userID.toString());
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AccountPage()),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Color theme has been resetted.'),
-                      ),
-                    );
 
                     // changeProfilePic(url);
                   });
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AccountPage()),
+                  );
+                  await Future.delayed(Duration(seconds: 1));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Color theme has been resetted.'),
+                    ),
+                  );
                 },
               ),
               ElevatedButton(
@@ -214,18 +200,19 @@ class _AccountPageState extends State<AccountPage> {
                   onPrimary: Colors.white, // foreground
                 ),
                 child: const Text('OK'),
-                onPressed: () {
+                onPressed: () async {
                   setState(() => currentColor = pickerColor);
                   changeProfileColor(pickerColor.value.toRadixString(16));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Theme color has been changed'),
-                    ),
-                  );
+                  await Future.delayed(Duration(seconds: 1));
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => const AccountPage()),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Theme color has been changed'),
+                    ),
                   );
                 },
               ),
@@ -252,8 +239,9 @@ class _AccountPageState extends State<AccountPage> {
                 ),
                 child: Text('OK'),
                 onPressed: () {
-                  setState(() {
-                    delAllData(userID.toString());
+                  setState(() async {
+                    await delAllData(userID.toString());
+                    await Future.delayed(Duration(seconds: 1));
                     FirebaseAuth.instance.signOut();
                     Navigator.push(
                       context,
@@ -316,7 +304,7 @@ class _AccountPageState extends State<AccountPage> {
         });
   }
 
-  Widget colorButton() => FutureBuilder(
+  Widget themeColorButton(String text) => FutureBuilder(
         future: themeColor,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -333,7 +321,7 @@ class _AccountPageState extends State<AccountPage> {
                     showColorPicker(context);
                   });
                 },
-                child: Text('Change Color Theme'));
+                child: Text(text));
           } else {
             return ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -348,7 +336,7 @@ class _AccountPageState extends State<AccountPage> {
                     showColorPicker(context);
                   });
                 },
-                child: Text('Change Color Theme'));
+                child: Text(text));
           }
         },
       );
@@ -488,7 +476,7 @@ class _AccountPageState extends State<AccountPage> {
                         SizedBox(
                           height: 10,
                         ),
-                        colorButton(),
+                        themeColorButton("Change Color Theme"),
                         SizedBox(
                           height: 10,
                         ),
@@ -647,7 +635,7 @@ class _AccountPageState extends State<AccountPage> {
                         SizedBox(
                           height: 10,
                         ),
-                        colorButton(),
+                        themeColorButton("Change Color Theme"),
                         SizedBox(
                           height: 10,
                         ),
@@ -829,7 +817,7 @@ class _AccountPageState extends State<AccountPage> {
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  colorButton(),
+                                  themeColorButton("Change Color Theme"),
                                   SizedBox(
                                     height: 10,
                                   ),
@@ -1005,7 +993,7 @@ class _AccountPageState extends State<AccountPage> {
                               SizedBox(
                                 height: 10,
                               ),
-                              colorButton(),
+                              themeColorButton("Change Color Theme"),
                               SizedBox(
                                 height: 10,
                               ),

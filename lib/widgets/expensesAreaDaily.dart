@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_function_literals_in_foreach_calls
 
 import 'package:costlynew/pages/newExpenses.dart';
-import 'package:costlynew/widgets/expensesTableYearly.dart';
+import 'package:costlynew/widgets/expensesTableDaily.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,14 +11,14 @@ import 'package:costlynew/data/data.dart';
 
 var funcGetYear = new GetTransactionsYearly();
 
-class TransactionsAreaYearly extends StatefulWidget {
-  const TransactionsAreaYearly({Key? key}) : super(key: key);
+class DayTransactionsArea extends StatefulWidget {
+  const DayTransactionsArea({Key? key}) : super(key: key);
 
   @override
-  State<TransactionsAreaYearly> createState() => _TransactionsAreaYearlyState();
+  State<DayTransactionsArea> createState() => _DayTransactionsAreaState();
 }
 
-class _TransactionsAreaYearlyState extends State<TransactionsAreaYearly> {
+class _DayTransactionsAreaState extends State<DayTransactionsArea> {
   final user = FirebaseAuth.instance.currentUser!;
   final db = FirebaseFirestore.instance;
   final year = (DateFormat('y').format(DateTime.now())).toString();
@@ -180,7 +180,7 @@ class _TransactionsAreaYearlyState extends State<TransactionsAreaYearly> {
     return newcpdAmount;
   }
 
-  late Future<List<dynamic>> transactionsDataYear;
+  late Future<List<dynamic>> transactionsDataDaily;
   @override
   void initState() {
     super.initState();
@@ -359,7 +359,7 @@ class _TransactionsAreaYearlyState extends State<TransactionsAreaYearly> {
               ),
             ),
             Positioned(
-              child: ExpensesWidgetYearly(),
+              child: ExpensesWidgetDaily(),
             )
           ]),
         ),

@@ -1,8 +1,7 @@
 // ignore_for_file: file_names, prefer_const_constructors, duplicate_ignore, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables
 
-import 'package:costlynew/pages/deviceLayout.dart';
-import 'package:costlynew/widgets/amountSpent.dart';
-import 'package:costlynew/widgets/expensesAreaDesktop.dart';
+import 'package:costlynew/data/data.dart';
+import 'package:costlynew/widgets/desktop/expensesAreaDesktop.dart';
 import 'package:costlynew/widgets/hero.dart';
 import 'package:costlynew/widgets/userWidgets.dart';
 import 'package:flutter/material.dart';

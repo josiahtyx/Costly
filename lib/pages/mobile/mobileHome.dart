@@ -7,7 +7,7 @@ import 'package:costlynew/pages/allTimeExpenses.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:costlynew/widgets/CPDAreaMonthlyMobile.dart';
-import 'package:costlynew/widgets/expensesAreaMobile.dart';
+import 'package:costlynew/widgets/mobile/expensesAreaMobile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:costlynew/pages/newExpenses.dart';
 

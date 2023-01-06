@@ -1,6 +1,5 @@
 import 'package:costlynew/data/data.dart';
 import 'package:costlynew/data/tempFields.dart';
-import 'package:costlynew/pages/allTimeExpenses.dart';
 import 'package:costlynew/pages/editExpenses.dart';
 import 'package:flutter/material.dart';
 import 'package:costlynew/pages/deviceLayout.dart';
@@ -12,14 +11,16 @@ import 'package:costlynew/data/data.dart';
 
 var funcGetYear = new GetTransactionsYearly();
 
-class ExpensesWidgetYearly extends StatefulWidget {
-  const ExpensesWidgetYearly({super.key});
+class ExpensesWidgetMobileAllTime extends StatefulWidget {
+  const ExpensesWidgetMobileAllTime({super.key});
 
   @override
-  State<ExpensesWidgetYearly> createState() => _ExpensesWidgetYearlyState();
+  State<ExpensesWidgetMobileAllTime> createState() =>
+      _ExpensesWidgetMobileAllTimeState();
 }
 
-class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
+class _ExpensesWidgetMobileAllTimeState
+    extends State<ExpensesWidgetMobileAllTime> {
   late Future<List<dynamic>> transactionsDataYear;
   final user = FirebaseAuth.instance.currentUser!;
   final db = FirebaseFirestore.instance;
@@ -30,6 +31,9 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
   int listLength = 1;
   late Future<String> themeColor;
   late bool _isLoading;
+  // Future<void> _handleRefresh() async {
+  //   await userTransactions;
+  // }
 
   void wait() async {
     _isLoading = true;
@@ -46,11 +50,16 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
   void initState() {
     super.initState();
     wait();
+    //This part needs to be updated to be manual or something
+
+    // getCPDtotal();
+    // totalCPD = getCPDtotal();
   }
 
   _loadData() async {
     await funcGetYear.getTransactions();
     transactionsDataYear = funcGetYear.getTransactions();
+    //print(transactionsDataMonth.toString());
   }
 
   Widget categoryButton(String index) {
@@ -230,7 +239,7 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
   Widget CPDday(String duration, String itemDate, String price) {
     if (duration == "0")
       return Text(
-        textAlign: TextAlign.center,
+        textAlign: TextAlign.end,
         style: GoogleFonts.nunito(
           color: Colors.black,
           fontSize: 20,
@@ -246,7 +255,7 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
       );
     else
       return Text(
-        textAlign: TextAlign.center,
+        textAlign: TextAlign.end,
         style: GoogleFonts.nunito(
           color: Colors.black,
           fontSize: 20,
@@ -262,7 +271,7 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
   }
 
   @override
-  Future<void> showDetails(
+  Future<void> showDetailsMobile(
     BuildContext context,
     String category,
     String costPerDay,
@@ -281,9 +290,9 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                 borderRadius: BorderRadius.all(Radius.circular(32.0))),
             content: SizedBox(
                 height: device.height * 0.8,
-                width: device.width * 0.3,
+                width: device.width * 0.8,
                 child: Padding(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -291,10 +300,11 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                         alignment: Alignment.center,
                         child: Container(
                           child: Text(
+                              textAlign: TextAlign.center,
                               style: GoogleFonts.nunito(
                                 textStyle: TextStyle(
                                   color: Colors.black,
-                                  fontSize: device.width * 0.03,
+                                  fontSize: device.width * 0.05,
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
@@ -303,247 +313,183 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                       ),
                       SizedBox(height: device.height * 0.03),
                       Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "Purchase Name:"),
-                                Spacer(),
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    itemName),
-                              ],
-                            ),
-                            SizedBox(
-                              height: device.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "Category:"),
-                                Spacer(),
-                                categoryButton(category),
-                              ],
-                            ),
-                            SizedBox(
-                              height: device.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "Price:"),
-                                Spacer(),
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    price + '€'),
-                              ],
-                            ),
-                            SizedBox(
-                              height: device.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "Purchased Date:"),
-                                Spacer(),
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    purchaseDate),
-                              ],
-                            ),
-                            SizedBox(
-                              height: device.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "End Date:"),
-                                Spacer(),
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    endDate),
-                              ],
-                            ),
-                            SizedBox(
-                              height: device.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "Duration:"),
-                                Spacer(),
-                                if (duration == "0")
-                                  Text(
-                                      style: GoogleFonts.nunito(
-                                        textStyle: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: device.height * 0.03,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      getDaysBetweenNow(purchaseDate)
-                                              .toString() +
-                                          " days")
-                                else
-                                  Text(
-                                      style: GoogleFonts.nunito(
-                                        textStyle: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: device.height * 0.03,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      duration + " days"),
-                              ],
-                            ),
-                            SizedBox(
-                              height: device.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    "CPD Amount:"),
-                                Spacer(),
-                                if (duration == "0")
-                                  Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    ((calculateCPDnow((purchaseDate), (price)))
-                                            .toString()
-                                            .replaceAll(RegExp(r'\.'), ',') +
-                                        "€" +
-                                        "/" +
-                                        getDaysBetweenNow(purchaseDate)
-                                            .toString() +
-                                        "d"),
-                                  )
-                                else
-                                  Text(
-                                    style: GoogleFonts.nunito(
-                                      textStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: device.height * 0.03,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    (((calculateCPDfixed((duration), (price)))
-                                                .toString())
-                                            .replaceAll(RegExp(r'\.'), ',') +
-                                        "€" +
-                                        "/" +
-                                        duration.toString() +
-                                        "d"),
+                            Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w800,
                                   ),
-                              ],
-                            )
-                          ]),
-                      Spacer(),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              primary: Colors.orange[800],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ) // Background color
-                              ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const EditExpensesPage()),
-                            );
-                          },
-                          child: Text(
-                            'Add',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
+                                ),
+                                "Purchase Name:"),
+                            Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                itemName),
+                            SizedBox(
+                              height: device.height * 0.01,
                             ),
-                          ),
-                        ),
-                      ),
+                            Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                "Category:"),
+                            categoryButton(category),
+                            SizedBox(
+                              height: device.height * 0.01,
+                            ),
+                            Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                "Price:"),
+                            Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                price + '€'),
+                            SizedBox(
+                              height: device.height * 0.01,
+                            ),
+                            Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                "Purchased Date:"),
+                            Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                purchaseDate),
+                            SizedBox(
+                              height: device.height * 0.01,
+                            ),
+                            Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                "End Date:"),
+                            Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                endDate),
+                            SizedBox(
+                              height: device.height * 0.01,
+                            ),
+                            Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                "Duration:"),
+                            if (duration == "0")
+                              Text(
+                                  style: GoogleFonts.nunito(
+                                    textStyle: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: device.height * 0.027,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  getDaysBetweenNow(purchaseDate).toString() +
+                                      " days")
+                            else
+                              Text(
+                                  style: GoogleFonts.nunito(
+                                    textStyle: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: device.height * 0.027,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  duration + " days"),
+                            SizedBox(
+                              height: device.height * 0.01,
+                            ),
+                            Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                "CPD Amount:"),
+                            if (duration == "0")
+                              Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                ((calculateCPDnow((purchaseDate), (price)))
+                                        .toString()
+                                        .replaceAll(RegExp(r'\.'), ',') +
+                                    "€" +
+                                    "/" +
+                                    getDaysBetweenNow(purchaseDate).toString() +
+                                    "d"),
+                              )
+                            else
+                              Text(
+                                style: GoogleFonts.nunito(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: device.height * 0.027,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                ((calculateCPDfixed((duration), (price)))
+                                        .toString()
+                                        .replaceAll(RegExp(r'\.'), ',') +
+                                    "€" +
+                                    "/" +
+                                    duration +
+                                    "d"),
+                              )
+                          ]),
                     ],
                   ),
                 )),
@@ -554,8 +500,7 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
   @override
   Widget build(BuildContext context) {
     final device = MediaQuery.of(context).size;
-    return Padding(
-      padding: const EdgeInsets.only(top: 68.0),
+    return Expanded(
       child: Container(
         child: _isLoading
             ? ListView.separated(
@@ -568,7 +513,7 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                       child: FutureBuilder(
                           future: transactionsDataYear,
                           builder: (context, snapshot) {
@@ -576,10 +521,9 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                               physics: BouncingScrollPhysics(),
                               scrollDirection: Axis.vertical,
                               shrinkWrap: true,
-                              itemCount: userTransactionsYearly.length,
+                              itemCount: userTransactions.length,
                               itemBuilder: ((context, index) {
-                                final item =
-                                    userTransactionsYearly[index].toString();
+                                final item = userTransactions[index].toString();
 
                                 return GestureDetector(
                                   onLongPress: () {
@@ -600,27 +544,21 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                                     );
                                   },
                                   onTap: () {
-                                    showDetails(
+                                    showDetailsMobile(
                                       context,
-                                      (userTransactionsYearly[index]
-                                              ['category'])
+                                      (userTransactions[index]['category'])
                                           .toString(),
-                                      (userTransactionsYearly[index]
-                                              ['costPerDay'])
+                                      (userTransactions[index]['costPerDay'])
                                           .toString(),
-                                      (userTransactionsYearly[index]
-                                              ['duration'])
+                                      (userTransactions[index]['duration'])
                                           .toString(),
-                                      (userTransactionsYearly[index]['endDate'])
+                                      (userTransactions[index]['endDate'])
                                           .toString(),
-                                      (userTransactionsYearly[index]
-                                              ['itemDate'])
+                                      (userTransactions[index]['itemDate'])
                                           .toString(),
-                                      (userTransactionsYearly[index]
-                                              ['itemName'])
+                                      (userTransactions[index]['itemName'])
                                           .toString(),
-                                      (userTransactionsYearly[index]
-                                              ['itemPrice'])
+                                      (userTransactions[index]['itemPrice'])
                                           .toString(),
                                     );
                                   },
@@ -655,32 +593,25 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(SnackBar(
                                                 content: Text(
-                                                    '${userTransactionsYearly[index]['itemName']} has been archived.')));
+                                                    '${userTransactions[index]['itemName']} has been archived.')));
                                         archiveTransaction(
-                                          (userTransactionsYearly[index]
-                                                  ['category'])
+                                          (userTransactions[index]['category'])
                                               .toString(),
-                                          // (userTransactionsYearly[index]['costPerDay'])
+                                          // (userTransactions[index]['costPerDay'])
                                           //     .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['duration'])
+                                          (userTransactions[index]['duration'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['endDate'])
+                                          (userTransactions[index]['endDate'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['itemDate'])
+                                          (userTransactions[index]['itemDate'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['itemName'])
+                                          (userTransactions[index]['itemName'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['itemPrice'])
+                                          (userTransactions[index]['itemPrice'])
                                               .toString(),
                                         );
                                         setState(() {
-                                          userTransactionsYearly
-                                              .removeAt(index);
+                                          userTransactions.removeAt(index);
                                         });
 
                                         await Future.delayed(
@@ -689,39 +620,32 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const TotalExpensesPage()),
+                                                  const HomePage()),
                                         );
                                       } else {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(SnackBar(
                                                 content: Text(
-                                                    '${userTransactionsYearly[index]['itemName']} has been deleted.')));
+                                                    '${userTransactions[index]['itemName']} has been deleted.')));
                                         delTransaction(
-                                          (userTransactionsYearly[index]
-                                                  ['category'])
+                                          (userTransactions[index]['category'])
                                               .toString(),
-                                          // (userTransactionsYearly[index]['costPerDay'])
+                                          // (userTransactions[index]['costPerDay'])
                                           //     .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['duration'])
+                                          (userTransactions[index]['duration'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['endDate'])
+                                          (userTransactions[index]['endDate'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['itemDate'])
+                                          (userTransactions[index]['itemDate'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['itemName'])
+                                          (userTransactions[index]['itemName'])
                                               .toString(),
-                                          (userTransactionsYearly[index]
-                                                  ['itemPrice'])
+                                          (userTransactions[index]['itemPrice'])
                                               .toString(),
                                         );
                                         // Remove the item from the data source.
                                         setState(() {
-                                          userTransactionsYearly
-                                              .removeAt(index);
+                                          userTransactions.removeAt(index);
                                         });
 
                                         await Future.delayed(
@@ -730,14 +654,15 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const TotalExpensesPage()),
+                                                  const HomePage()),
                                         );
                                       }
 
                                       // Then show a snackbar.
                                     },
                                     child: Padding(
-                                      padding: const EdgeInsets.all(5.0),
+                                      padding: const EdgeInsets.fromLTRB(
+                                          15, 5, 15, 5),
                                       child: Align(
                                         alignment: Alignment.center,
                                         child: ListTile(
@@ -747,63 +672,34 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.w700,
                                               ),
-                                              (userTransactionsYearly[index]
+                                              (userTransactions[index]
                                                       ['itemName'])
                                                   .toString()),
                                           // subtitle: Text(('Item Price: ' +
-                                          //         userTransactionsYearly[index]['itemPrice']
+                                          //         userTransactions[index]['itemPrice']
                                           //             .replaceAll(RegExp(r'\.'), ',') +
                                           //         '€' +
                                           //         '\nPurchase Date: ' +
-                                          //         userTransactionsYearly[index]['itemDate'] +
+                                          //         userTransactions[index]['itemDate'] +
                                           //         '')
                                           //     .toString()),
                                           trailing: Wrap(
                                             spacing:
                                                 0, // space between two icons
                                             children: <Widget>[
-                                              categoryButton(
-                                                  userTransactionsYearly[index]
-                                                      ['category']),
                                               Padding(
                                                   padding:
                                                       const EdgeInsets.only(
                                                           left: 80.0),
                                                   child: SizedBox(
-                                                    width: 120,
                                                     child: CPDday(
-                                                        userTransactionsYearly[
-                                                            index]['duration'],
-                                                        userTransactionsYearly[
-                                                            index]['itemDate'],
-                                                        userTransactionsYearly[
-                                                                index]
+                                                        userTransactions[index]
+                                                            ['duration'],
+                                                        userTransactions[index]
+                                                            ['itemDate'],
+                                                        userTransactions[index]
                                                             ['itemPrice']),
                                                   )),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 50.0),
-                                                child: SizedBox(
-                                                  width: 110,
-                                                  child: Text(
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                      ),
-                                                      ((userTransactionsYearly[
-                                                                      index][
-                                                                  'itemPrice']))
-                                                              .toString()
-                                                              .replaceAll(
-                                                                  RegExp(r'\.'),
-                                                                  ',') +
-                                                          "€"),
-                                                ),
-                                              ),
                                             ],
                                           ),
                                         ),
@@ -814,13 +710,6 @@ class _ExpensesWidgetYearlyState extends State<ExpensesWidgetYearly> {
                               }),
                             );
                           }),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 40, 0, 30),
-                      child: EndBar(
-                        height: 10,
-                        width: 150,
-                      ),
                     )
                   ],
                 ),
@@ -845,21 +734,9 @@ class AsyncBarRow extends StatelessWidget {
           children: [
             Expanded(child: AsyncBar()),
             Padding(
-              padding: const EdgeInsets.fromLTRB(160, 0, 35, 0),
-              child: AsyncBar(
-                width: 130,
-              ),
-            ),
-            Padding(
               padding: const EdgeInsets.fromLTRB(38, 0, 5, 0),
               child: AsyncBar(
-                width: 120,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(55, 0, 8.0, 0),
-              child: AsyncBar(
-                width: 80,
+                width: 110,
               ),
             ),
           ],
@@ -886,28 +763,6 @@ class AsyncBar extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.1),
-          borderRadius: const BorderRadius.all(Radius.circular(16))),
-    );
-  }
-}
-
-class EndBar extends StatelessWidget {
-  const EndBar({
-    Key? key,
-    this.height,
-    this.width,
-  }) : super(key: key);
-
-  final double? height, width;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      width: width,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.05),
           borderRadius: const BorderRadius.all(Radius.circular(16))),
     );
   }

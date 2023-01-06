@@ -3,7 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:costlynew/pages/deviceLayout.dart';
 import 'package:costlynew/widgets/CPDAreaAllTime.dart';
-import 'package:costlynew/widgets/expensesAreaAllTimeMobile.dart';
+import 'package:costlynew/widgets/mobile/expensesAreaAllTimeMobile.dart';
 import 'package:costlynew/widgets/expensesTableYearly.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

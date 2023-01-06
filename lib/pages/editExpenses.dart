@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, unused_field, use_build_context_synchronously, avoid_print, prefer_interpolation_to_compose_strings, unnecessary_string_interpolations, deprecated_member_use, file_names, unused_import, unnecessary_new, non_constant_identifier_names
 
 import 'package:costlynew/auth/main_page.dart';
+import 'package:costlynew/data/data.dart';
 import 'package:costlynew/pages/deviceLayout.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,21 +9,23 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:costlynew/data/tempFields.dart';
 
-class AddExpensesPage extends StatefulWidget {
-  const AddExpensesPage({Key? key}) : super(key: key);
+class EditExpensesPage extends StatefulWidget {
+  const EditExpensesPage({Key? key}) : super(key: key);
 
   @override
-  State<AddExpensesPage> createState() => _AddExpensesPageState();
+  State<EditExpensesPage> createState() => _EditExpensesPageState();
 }
 
-class _AddExpensesPageState extends State<AddExpensesPage> {
+class _EditExpensesPageState extends State<EditExpensesPage> {
   FocusNode myFocusNode = new FocusNode();
   final db = FirebaseFirestore.instance;
   TextEditingController dateinput = TextEditingController();
+  TextEditingController endDateInput = TextEditingController();
   DateTime? pickedStartDate;
   DateTime? pickedEndDate;
-  TextEditingController endDateInput = TextEditingController();
+
   final _itemNameController = TextEditingController();
   final _itemCategoryController = TextEditingController();
   final _priceController = TextEditingController();
@@ -30,6 +33,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
   final year = DateFormat('y').format(DateTime.now());
   final userID = FirebaseAuth.instance.currentUser?.uid;
   String dropdownCategory = "No Category";
+  String duration = "0";
 
   var categories = [
     'No Category',
@@ -43,10 +47,9 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
     'Utilities',
   ];
 
-  String duration = "0";
-  durationDays(String duration) {
-    this.duration = duration;
-  }
+  // durationDays(String duration) {
+  //   this.duration = duration;
+  // }
 
   late String daysBetween;
   callBackDaysBetween(String daysBetween) {
@@ -58,12 +61,43 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
     this.transactionMY = transactionMY;
   }
 
+  Future<void> modifyTextFields() async {
+    _itemNameController.value = TextEditingValue(text: itemNamex);
+    _itemNameController.text = itemNamex;
+    _priceController.value = TextEditingValue(text: pricex);
+    _priceController.text = pricex;
+    pickedStartDate = DateTime.parse(purchaseDatex);
+    if (endDatex == "") {
+    } else {
+      pickedEndDate = DateTime.parse(endDatex);
+    }
+    _itemCategoryController.value = TextEditingValue(text: itemCategoryx);
+    _itemCategoryController.text = itemCategoryx;
+    dateinput.text = purchaseDatex;
+    endDateInput.text = endDatex;
+    dropdownCategory = itemCategoryx;
+    transactionMY = DateFormat('MMMM y').format(DateTime.parse(purchaseDatex));
+  }
+
+  String durationCal() {
+    if (pickedEndDate == null) {
+      return "0";
+    } else {
+      final difference =
+          (pickedEndDate?.difference(pickedStartDate!).inDays).toString();
+      duration = (int.parse(difference) + 1).toString();
+      //print(duration);
+      return duration;
+    }
+  }
+
   String CPDCalculator() {
     double price = double.parse(_priceController.text.replaceAll(',', '.'));
     int days = int.parse(duration.toString());
     String tempCPD = (price / days).toStringAsFixed(2);
     double totalCPD = double.parse(tempCPD);
     String totalCPDstring = totalCPD.toString();
+
     // double finalCPD = double.parse(totalCPDstring.replaceAll('.', ','));
     return totalCPDstring;
   }
@@ -74,7 +108,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
       String purchaseDate,
       String endDate,
       String duration,
-      String costPerDay,
+      // String costPerDay,
       String itemCategory) async {
     await db
         .collection('userData')
@@ -141,8 +175,11 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
 
   @override
   void initState() {
-    dateinput.text = ""; //set the initial value of text field
     super.initState();
+
+    //set the initial value of text field
+
+    modifyTextFields();
   }
 
   @override
@@ -209,7 +246,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                     //     Navigator.push(
                     //       context,
                     //       MaterialPageRoute(
-                    //           builder: (context) => const AddExpensesPage()),
+                    //           builder: (context) => const EditExpensesPage()),
                     //     );
                     //   },
                     //   child: Text('Add'),
@@ -236,7 +273,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'What was your purchase?',
+                          'Purchase Name',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 20,
@@ -372,55 +409,53 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                             readOnly:
                                 true, //set it true, so that user will not able to edit text
                             onTap: () async {
-                              DateTime? pickedDate = await showDatePicker(
-                                builder: (context, child) {
-                                  return Theme(
-                                    data: Theme.of(context).copyWith(
-                                      colorScheme: ColorScheme.light(
-                                        primary: Colors
-                                            .orange, // header background color
-                                        onPrimary:
-                                            Colors.white, // header text color
-                                        onSurface:
-                                            Colors.black, // body text color
-                                      ),
-                                      textButtonTheme: TextButtonThemeData(
-                                        style: TextButton.styleFrom(
-                                          primary:
-                                              Colors.black, // button text color
+                              pickedStartDate = await showDatePicker(
+                                  builder: (context, child) {
+                                    return Theme(
+                                      data: Theme.of(context).copyWith(
+                                        colorScheme: ColorScheme.light(
+                                          primary: Colors
+                                              .orange, // header background color
+                                          onPrimary:
+                                              Colors.white, // header text color
+                                          onSurface:
+                                              Colors.black, // body text color
+                                        ),
+                                        textButtonTheme: TextButtonThemeData(
+                                          style: TextButton.styleFrom(
+                                            primary: Colors
+                                                .black, // button text color
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    child: child!,
-                                  );
-                                },
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(
-                                    2000), //DateTime.now() - not to allow to choose before today.
-                                lastDate: DateTime(2100),
-                              );
+                                      child: child!,
+                                    );
+                                  },
+                                  context: context,
+                                  initialDate: DateTime.parse(purchaseDatex),
+                                  firstDate: DateTime(
+                                      2000), //DateTime.now() - not to allow to choose before today.
+                                  lastDate: DateTime(2100));
 
-                              if (pickedDate != null) {
-                                // print(pickedDate);
+                              if (pickedStartDate != null) {
+                                // print(pickedStartDate);
 
-                                final transactionMY =
-                                    DateFormat('MMMM y').format(pickedDate);
+                                final transactionMY = DateFormat('MMMM y')
+                                    .format(pickedStartDate!);
 
                                 final difference = (DateTime.now()
-                                        .difference(pickedDate)
+                                        .difference(pickedStartDate!)
                                         .inDays)
                                     .toString();
                                 // print(difference);
                                 // print(transactionMY);
-                                String formattedDate =
-                                    DateFormat('yyyy-MM-dd').format(pickedDate);
+                                String formattedDate = DateFormat('yyyy-MM-dd')
+                                    .format(pickedStartDate!);
                                 // print(
                                 //     formattedDate); //formatted date output using intl package =>  2021-03-16
                                 //you can implement different kind of Date Format here according to your requirement
 
                                 setState(() {
-                                  pickedStartDate = pickedDate;
                                   //print(pickedStartDate);
                                   dateinput.text = formattedDate;
 
@@ -484,7 +519,7 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                             readOnly:
                                 true, //set it true, so that user will not able to edit text
                             onTap: () async {
-                              DateTime? pickedEndDate = await showDatePicker(
+                              pickedEndDate = await showDatePicker(
                                   builder: (context, child) {
                                     return Theme(
                                       data: Theme.of(context).copyWith(
@@ -509,30 +544,23 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                                   context: context,
                                   initialDate: DateTime.now(),
                                   firstDate: DateTime.parse(pickedStartDate
-                                      .toString()), //Not to allow to choose before start date.
+                                      .toString()), //Not to allow to choose before initial date.
                                   lastDate: DateTime(2200));
 
                               if (pickedEndDate != null) {
-                                // print(pickedDate);
-
-                                final difference = (pickedEndDate
-                                        .difference(pickedStartDate!)
-                                        .inDays)
-                                    .toString();
+                                //print(pickedEndDate);
 
                                 // print(transactionMY);
                                 String formattedDate = DateFormat('yyyy-MM-dd')
-                                    .format(pickedEndDate);
-                                int duration = int.parse(difference) + 1;
+                                    .format(pickedEndDate!);
+
                                 //print(duration);
                                 // print(
                                 //     formattedDate); //formatted date output using intl package =>  2021-03-16
                                 //you can implement different kind of Date Format here according to your requirement
-
                                 setState(() {
                                   endDateInput.text =
                                       formattedDate; //to change textfield section
-                                  durationDays(duration.toString());
                                 });
                               } else {
                                 print("Date is not selected");
@@ -614,6 +642,10 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
               ElevatedButton(
                 onPressed: () async {
                   setState(() {
+                    //print(durationCal() + pickedEndDate.toString());
+                    delTransaction(itemCategoryx, durationx, endDatex,
+                        purchaseDatex, itemNamex, pricex);
+
                     addTransaction(
                         _itemNameController.text.trim(),
                         _priceController.text
@@ -621,12 +653,12 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                             .replaceAll(RegExp(r','), '.'),
                         dateinput.text.trim(),
                         endDateInput.text.trim(),
-                        duration.trim(),
-                        CPDCalculator(),
+                        durationCal().trim(),
+                        // CPDCalculator(),
                         dropdownCategory);
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Transaction has been added!')));
+                      SnackBar(content: Text('Transaction edited!')));
                   await Future.delayed(Duration(seconds: 1));
                   Navigator.push(
                     context,
@@ -641,9 +673,9 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                     ),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                  child: Text('Add'),
+                  child: Text('Edit'),
                 ),
-              )
+              ),
             ],
           ),
         ),
